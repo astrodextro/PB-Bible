@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:baselineAligned="false"
+    >
+
+	<Button android:id="@+id/btnBrowse"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/browse"
+		android:layout_marginLeft="10dp"
+		/>
+
+	<ImageButton
+		android:id="@+id/btnSpeak"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="10dp"
+		android:background="@android:color/transparent"
+		android:src="@drawable/btn_speak" />
+
+<EditText android:id="@+id/edtBook"
+	android:layout_width="150sp"
+	android:layout_height="wrap_content"
+	android:inputType="textCapWords"
+	android:singleLine="true"
+	android:layout_weight="1.0"
+	android:layout_marginLeft="10dp"
+	android:layout_marginRight="10dp"
+	/>
+
+
+
+
+
+</LinearLayout>

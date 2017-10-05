@@ -1,0 +1,251 @@
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/6/trunk/src/com/konibee/bible
+END
+BookmarkDateAscComparator.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/BookmarkDateAscComparator.java
+END
+BibleVersion.java
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/BibleVersion.java
+END
+ConfigureWidget.java
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/ConfigureWidget.java
+END
+Bookmarks.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/Bookmarks.java
+END
+MyAppWidget.java
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/MyAppWidget.java
+END
+DisplayBookmarkAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DisplayBookmarkAdapter.java
+END
+DisplayDownload.java
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DisplayDownload.java
+END
+DisplayDownloadAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DisplayDownloadAdapter.java
+END
+Documents.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/6/trunk/src/com/konibee/bible/Documents.java
+END
+BiblesOffline.java
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/6/trunk/src/com/konibee/bible/BiblesOffline.java
+END
+DatabaseHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DatabaseHelper.java
+END
+GoToBible.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/GoToBible.java
+END
+DownloadDocument.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DownloadDocument.java
+END
+AboutBible.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/AboutBible.java
+END
+ReadBible.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/5/trunk/src/com/konibee/bible/ReadBible.java
+END
+AboutDocument.java
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/AboutDocument.java
+END
+ReadBibleHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/ReadBibleHelper.java
+END
+DisplayVerseAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/6/trunk/src/com/konibee/bible/DisplayVerseAdapter.java
+END
+Util.java
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/Util.java
+END
+Find.java
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/Find.java
+END
+DownloadBookname.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/5/trunk/src/com/konibee/bible/DownloadBookname.java
+END
+Categories.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/Categories.java
+END
+DisplayHistoryAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DisplayHistoryAdapter.java
+END
+Help.java
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/Help.java
+END
+BookmarkDateDescComparator.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/BookmarkDateDescComparator.java
+END
+SelectParallelBible.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/SelectParallelBible.java
+END
+DisplaySearchResultAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DisplaySearchResultAdapter.java
+END
+DownloadBookmark.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/5/trunk/src/com/konibee/bible/DownloadBookmark.java
+END
+SearchResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/SearchResult.java
+END
+WidgetModel.java
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/WidgetModel.java
+END
+Bookmark.java
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/Bookmark.java
+END
+DownloadBible.java
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DownloadBible.java
+END
+DisplayVerseAdapterRead.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/6/trunk/src/com/konibee/bible/DisplayVerseAdapterRead.java
+END
+BrowseChapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/BrowseChapter.java
+END
+GoTo.java
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/GoTo.java
+END
+About.java
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/About.java
+END
+DisplayVerse.java
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/DisplayVerse.java
+END
+DisplayLanguageAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/5/trunk/src/com/konibee/bible/DisplayLanguageAdapter.java
+END
+Constants.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/Constants.java
+END
+BrowseBook.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/3/trunk/src/com/konibee/bible/BrowseBook.java
+END
+Prefs.java
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/5/trunk/src/com/konibee/bible/Prefs.java
+END

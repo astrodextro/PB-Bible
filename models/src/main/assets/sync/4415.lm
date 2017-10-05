@@ -1,0 +1,298 @@
+language model created by quicklm on tue sep 26 07:56:30 edt 2017
+copyright (c) 1996-2010 carnegie mellon university and alexander i. rudnicky
+
+the model is in standard arpa format, designed by doug paul while he was at mitre.
+
+the code that was used to produce this language model is available in open source.
+please visit http://www.speech.cs.cmu.edu/tools/ for more information
+
+the (fixed) discount mass is 0.5. the backoffs are computed using the ratio method.
+this model based on a corpus of 66 sentences and 63 words
+
+\data\
+ngram 1=63
+ngram 2=127
+ngram 3=85
+
+\1-grams:
+-0.8179 </s> -0.3010
+-0.8179 <s> -0.2258
+-2.6375 acts -0.2294
+-2.6375 amos -0.2294
+-2.3365 chronicles -0.2294
+-2.6375 colossians -0.2294
+-2.3365 corinthians -0.2294
+-2.6375 daniel -0.2294
+-2.6375 deuteronomy -0.2294
+-2.6375 ecclesiastes -0.2294
+-2.6375 ephesians -0.2294
+-2.6375 esther -0.2294
+-2.6375 exodus -0.2294
+-2.6375 ezekiel -0.2294
+-2.6375 ezra -0.2294
+-1.7344 first -0.2826
+-2.6375 galatians -0.2294
+-2.6375 genesis -0.2294
+-2.6375 habakkuk -0.2294
+-2.6375 haggai -0.2294
+-2.6375 hebrews -0.2294
+-2.6375 hosea -0.2294
+-2.6375 isaiah -0.2294
+-2.6375 james -0.2294
+-2.6375 jeremiah -0.2294
+-2.6375 job -0.2294
+-2.6375 joel -0.2294
+-2.0354 john -0.2294
+-2.6375 jonah -0.2294
+-2.6375 joshua -0.2294
+-2.6375 jude -0.2294
+-2.6375 judges -0.2294
+-2.3365 kings -0.2294
+-2.6375 lamentations -0.2294
+-2.6375 leviticus -0.2294
+-2.6375 luke -0.2294
+-2.6375 malachi -0.2294
+-2.6375 mark -0.2294
+-2.6375 matthew -0.2294
+-2.6375 micah -0.2294
+-2.6375 nahum -0.2294
+-2.6375 nehemiah -0.2294
+-2.6375 numbers -0.2294
+-2.6375 obadiah -0.2294
+-2.6375 of -0.3000
+-2.3365 peter -0.2294
+-2.6375 philemon -0.2294
+-2.6375 philippians -0.2294
+-2.6375 proverbs -0.2294
+-2.6375 revelation -0.2294
+-2.6375 romans -0.2294
+-2.6375 ruth -0.2294
+-2.6375 sam -0.2294
+-2.3365 samuel -0.2294
+-1.7344 second -0.2826
+-2.6375 solomon -0.2294
+-2.6375 songs -0.3000
+-2.3365 thessalonians -0.2294
+-2.6375 third -0.2970
+-2.3365 timothy -0.2294
+-2.6375 titus -0.2294
+-2.6375 zechariah -0.2294
+-2.6375 zephaniah -0.2294
+
+\2-grams:
+-2.1206 <s> acts 0.0000
+-2.1206 <s> amos 0.0000
+-2.1206 <s> colossians 0.0000
+-2.1206 <s> daniel 0.0000
+-2.1206 <s> deuteronomy 0.0000
+-2.1206 <s> ecclesiastes 0.0000
+-2.1206 <s> ephesians 0.0000
+-2.1206 <s> esther 0.0000
+-2.1206 <s> exodus 0.0000
+-2.1206 <s> ezekiel 0.0000
+-2.1206 <s> ezra 0.0000
+-1.2175 <s> first 0.0000
+-2.1206 <s> galatians 0.0000
+-2.1206 <s> genesis 0.0000
+-2.1206 <s> habakkuk 0.0000
+-2.1206 <s> haggai 0.0000
+-2.1206 <s> hebrews 0.0000
+-2.1206 <s> hosea 0.0000
+-2.1206 <s> isaiah 0.0000
+-2.1206 <s> james 0.0000
+-2.1206 <s> jeremiah 0.0000
+-2.1206 <s> job 0.0000
+-2.1206 <s> joel 0.0000
+-2.1206 <s> john 0.0000
+-2.1206 <s> jonah 0.0000
+-2.1206 <s> joshua 0.0000
+-2.1206 <s> jude 0.0000
+-2.1206 <s> judges 0.0000
+-2.1206 <s> lamentations 0.0000
+-2.1206 <s> leviticus 0.0000
+-2.1206 <s> luke 0.0000
+-2.1206 <s> malachi 0.0000
+-2.1206 <s> mark 0.0000
+-2.1206 <s> matthew 0.0000
+-2.1206 <s> micah 0.0000
+-2.1206 <s> nahum 0.0000
+-2.1206 <s> nehemiah 0.0000
+-2.1206 <s> numbers 0.0000
+-2.1206 <s> obadiah 0.0000
+-2.1206 <s> philemon 0.0000
+-2.1206 <s> philippians 0.0000
+-2.1206 <s> proverbs 0.0000
+-2.1206 <s> revelation 0.0000
+-2.1206 <s> romans 0.0000
+-2.1206 <s> ruth 0.0000
+-2.1206 <s> sam 0.0000
+-1.2175 <s> second 0.0000
+-2.1206 <s> songs 0.0000
+-2.1206 <s> third 0.0000
+-2.1206 <s> titus 0.0000
+-2.1206 <s> zechariah 0.0000
+-2.1206 <s> zephaniah 0.0000
+-0.3010 acts </s> -0.3010
+-0.3010 amos </s> -0.3010
+-0.3010 chronicles </s> -0.3010
+-0.3010 colossians </s> -0.3010
+-0.3010 corinthians </s> -0.3010
+-0.3010 daniel </s> -0.3010
+-0.3010 deuteronomy </s> -0.3010
+-0.3010 ecclesiastes </s> -0.3010
+-0.3010 ephesians </s> -0.3010
+-0.3010 esther </s> -0.3010
+-0.3010 exodus </s> -0.3010
+-0.3010 ezekiel </s> -0.3010
+-0.3010 ezra </s> -0.3010
+-1.2041 first chronicles 0.0000
+-1.2041 first corinthians 0.0000
+-1.2041 first john 0.0000
+-1.2041 first kings 0.0000
+-1.2041 first peter 0.0000
+-1.2041 first samuel 0.0000
+-1.2041 first thessalonians 0.0000
+-1.2041 first timothy 0.0000
+-0.3010 galatians </s> -0.3010
+-0.3010 genesis </s> -0.3010
+-0.3010 habakkuk </s> -0.3010
+-0.3010 haggai </s> -0.3010
+-0.3010 hebrews </s> -0.3010
+-0.3010 hosea </s> -0.3010
+-0.3010 isaiah </s> -0.3010
+-0.3010 james </s> -0.3010
+-0.3010 jeremiah </s> -0.3010
+-0.3010 job </s> -0.3010
+-0.3010 joel </s> -0.3010
+-0.3010 john </s> -0.3010
+-0.3010 jonah </s> -0.3010
+-0.3010 joshua </s> -0.3010
+-0.3010 jude </s> -0.3010
+-0.3010 judges </s> -0.3010
+-0.3010 kings </s> -0.3010
+-0.3010 lamentations </s> -0.3010
+-0.3010 leviticus </s> -0.3010
+-0.3010 luke </s> -0.3010
+-0.3010 malachi </s> -0.3010
+-0.3010 mark </s> -0.3010
+-0.3010 matthew </s> -0.3010
+-0.3010 micah </s> -0.3010
+-0.3010 nahum </s> -0.3010
+-0.3010 nehemiah </s> -0.3010
+-0.3010 numbers </s> -0.3010
+-0.3010 obadiah </s> -0.3010
+-0.3010 of solomon 0.0000
+-0.3010 peter </s> -0.3010
+-0.3010 philemon </s> -0.3010
+-0.3010 philippians </s> -0.3010
+-0.3010 proverbs </s> -0.3010
+-0.3010 revelation </s> -0.3010
+-0.3010 romans </s> -0.3010
+-0.3010 ruth </s> -0.3010
+-0.3010 sam </s> -0.3010
+-0.3010 samuel </s> -0.3010
+-1.2041 second chronicles 0.0000
+-1.2041 second corinthians 0.0000
+-1.2041 second john 0.0000
+-1.2041 second kings 0.0000
+-1.2041 second peter 0.0000
+-1.2041 second samuel 0.0000
+-1.2041 second thessalonians 0.0000
+-1.2041 second timothy 0.0000
+-0.3010 solomon </s> -0.3010
+-0.3010 songs of 0.0000
+-0.3010 thessalonians </s> -0.3010
+-0.3010 third john 0.0000
+-0.3010 timothy </s> -0.3010
+-0.3010 titus </s> -0.3010
+-0.3010 zechariah </s> -0.3010
+-0.3010 zephaniah </s> -0.3010
+
+\3-grams:
+-0.3010 <s> acts </s>
+-0.3010 <s> amos </s>
+-0.3010 <s> colossians </s>
+-0.3010 <s> daniel </s>
+-0.3010 <s> deuteronomy </s>
+-0.3010 <s> ecclesiastes </s>
+-0.3010 <s> ephesians </s>
+-0.3010 <s> esther </s>
+-0.3010 <s> exodus </s>
+-0.3010 <s> ezekiel </s>
+-0.3010 <s> ezra </s>
+-1.2041 <s> first chronicles
+-1.2041 <s> first corinthians
+-1.2041 <s> first john
+-1.2041 <s> first kings
+-1.2041 <s> first peter
+-1.2041 <s> first samuel
+-1.2041 <s> first thessalonians
+-1.2041 <s> first timothy
+-0.3010 <s> galatians </s>
+-0.3010 <s> genesis </s>
+-0.3010 <s> habakkuk </s>
+-0.3010 <s> haggai </s>
+-0.3010 <s> hebrews </s>
+-0.3010 <s> hosea </s>
+-0.3010 <s> isaiah </s>
+-0.3010 <s> james </s>
+-0.3010 <s> jeremiah </s>
+-0.3010 <s> job </s>
+-0.3010 <s> joel </s>
+-0.3010 <s> john </s>
+-0.3010 <s> jonah </s>
+-0.3010 <s> joshua </s>
+-0.3010 <s> jude </s>
+-0.3010 <s> judges </s>
+-0.3010 <s> lamentations </s>
+-0.3010 <s> leviticus </s>
+-0.3010 <s> luke </s>
+-0.3010 <s> malachi </s>
+-0.3010 <s> mark </s>
+-0.3010 <s> matthew </s>
+-0.3010 <s> micah </s>
+-0.3010 <s> nahum </s>
+-0.3010 <s> nehemiah </s>
+-0.3010 <s> numbers </s>
+-0.3010 <s> obadiah </s>
+-0.3010 <s> philemon </s>
+-0.3010 <s> philippians </s>
+-0.3010 <s> proverbs </s>
+-0.3010 <s> revelation </s>
+-0.3010 <s> romans </s>
+-0.3010 <s> ruth </s>
+-0.3010 <s> sam </s>
+-1.2041 <s> second chronicles
+-1.2041 <s> second corinthians
+-1.2041 <s> second john
+-1.2041 <s> second kings
+-1.2041 <s> second peter
+-1.2041 <s> second samuel
+-1.2041 <s> second thessalonians
+-1.2041 <s> second timothy
+-0.3010 <s> songs of
+-0.3010 <s> third john
+-0.3010 <s> titus </s>
+-0.3010 <s> zechariah </s>
+-0.3010 <s> zephaniah </s>
+-0.3010 first chronicles </s>
+-0.3010 first corinthians </s>
+-0.3010 first john </s>
+-0.3010 first kings </s>
+-0.3010 first peter </s>
+-0.3010 first samuel </s>
+-0.3010 first thessalonians </s>
+-0.3010 first timothy </s>
+-0.3010 of solomon </s>
+-0.3010 second chronicles </s>
+-0.3010 second corinthians </s>
+-0.3010 second john </s>
+-0.3010 second kings </s>
+-0.3010 second peter </s>
+-0.3010 second samuel </s>
+-0.3010 second thessalonians </s>
+-0.3010 second timothy </s>
+-0.3010 songs of solomon
+-0.3010 third john </s>
+
+\end\

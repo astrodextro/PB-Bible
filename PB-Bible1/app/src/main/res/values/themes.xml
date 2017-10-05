@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppBaseTheme.Base" parent="@android:style/Theme.NoTitleBar">
+    </style>
+    <style name="AppBaseTheme" parent="@android:style/Theme.NoTitleBar">
+        <item name="textBible">@style/text_dark</item>
+    </style>
+
+    <!--No Title Bar Theme-->
+    <style name="AppBaseTheme.Dark" parent="@android:style/Theme.NoTitleBar">
+        <item name="textBible">@style/text_dark</item>
+    </style>
+    <style name="AppBaseTheme.Light" parent="@android:style/Theme.NoTitleBar">
+        <item name="textBible">@style/text_light</item>
+    </style>
+
+    <!--Dialog theme-->
+    <style name="AppBaseTheme.Dialog.Light" parent="@android:style/Theme.Dialog">
+        <item name="textBible">@style/text_light</item>
+    </style>
+    <style name="AppBaseTheme.Dialog.Dark" parent="@android:style/Theme.Dialog">
+        <item name="textBible">@style/text_dark</item>
+    </style>
+
+    <!--AppCompat theme-->
+    <style name="AppBaseTheme.AppCompat.Light" parent="Theme.AppCompat.Light">
+        <item name="textBible">@style/text_light</item>
+    </style>
+    <style name="AppBaseTheme.AppCompat.Dark" parent="Theme.AppCompat">
+        <item name="textBible">@style/text_light</item>
+    </style>
+</resources>
+

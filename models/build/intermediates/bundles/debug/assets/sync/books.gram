@@ -1,0 +1,91 @@
+#JSGF V1.0;
+
+grammar digits;
+
+<digit> = oh    |
+          zero  |
+          one   |
+          two   |
+          three |
+          four  |
+          five  |
+          six   |
+          seven |
+          eight |
+          nine  ;
+
+public <digits> = <digit>+;
+
+
+#JSGF V1.0;
+
+grammar books;
+
+<book> =    genesis |
+            exodus |
+            leviticus |
+            numbers |
+            deuteronomy |
+            joshua |
+            judges |
+            ruth |
+            first samuel |
+            second samuel |
+            first kings |
+            second kings |
+            first chronicles |
+            second chronicles |
+            ezra |
+            nehemiah |
+            esther |
+            job |
+            sam |
+            proverbs |
+            ecclesiastes |
+            songs of solomon |
+            isaiah |
+            jeremiah |
+            lamentations |
+            ezekiel |
+            daniel |
+            hosea |
+            joel |
+            amos |
+            obadiah |
+            jonah |
+            micah |
+            nahum |
+            habakkuk |
+            zephaniah |
+            haggai |
+            zechariah |
+            malachi |
+            matthew |
+            mark |
+            luke |
+            john |
+            acts |
+            romans |
+            first corinthians |
+            second corinthians |
+            galatians |
+            ephesians |
+            philippians |
+            colossians |
+            first thessalonians |
+            second thessalonians |
+            first timothy |
+            second timothy |
+            titus |
+            philemon |
+            hebrews |
+            james |
+            first peter |
+            second peter |
+            first john |
+            second john |
+            third john |
+            jude |
+            revelation;
+
+public <books> = <book>+;

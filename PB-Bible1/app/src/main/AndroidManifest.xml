@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.felixunlimited.pbbible">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true">
+        <activity
+            android:name=".Voice"
+            android:label="Speak"
+            android:theme="@style/AppBaseTheme.Dialog.Dark" />
+        <activity
+            android:name=".BiblesOffline"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name_label"
+            android:theme="@style/AppBaseTheme.Dark">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".About"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/about_title"
+            android:theme="@style/AppBaseTheme.Dialog.Dark" />
+        <activity
+            android:name=".AboutBible"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/aboutbible_title"
+            android:theme="@style/AppBaseTheme.Dialog.Dark" />
+        <activity
+            android:name=".Bookmarks"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/bookmarks_title" />
+        <activity
+            android:name=".Categories"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/categories_title" />
+        <activity
+            android:name=".Find"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/find_title" />
+        <activity
+            android:name=".DownloadBible"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/downloadBible_title" />
+        <activity
+            android:name=".DownloadBookmark"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/downloadBookmark_title" />
+        <activity
+            android:name=".DownloadBookname"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/downloadBookname_title" />
+        <activity
+            android:name=".Help"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/help_title"
+            android:theme="@style/AppBaseTheme.Dialog.Dark" />
+        <activity
+            android:name=".GoTo"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/goto_title"
+            android:theme="@style/AppBaseTheme.Dialog.Dark"
+            android:windowSoftInputMode="stateAlwaysVisible" />
+        <activity
+            android:name=".SelectParallelBible"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/selectParallel_title"
+            android:theme="@style/AppBaseTheme.Dialog.Dark" />
+        <activity
+            android:name=".BrowseBook"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/browseBook_title" />
+        <activity
+            android:name=".BrowseChapter"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/browseChapter_title" />
+        <activity
+            android:name=".Documents"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/documents"
+            android:theme="@style/AppBaseTheme.Dark" />
+        <activity
+            android:name=".DownloadDocument"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/downloadDocument" />
+        <activity
+            android:name=".AboutDocument"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/aboutdocument_title"
+            android:theme="@style/AppBaseTheme.Dialog.Dark" />
+        <activity
+            android:name=".ReadBible"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/readBible"
+            android:theme="@style/AppBaseTheme.Dark" />
+        <activity
+            android:name=".Prefs"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/settings" />
+        <activity
+            android:name=".ConfigureWidget"
+            android:label="@string/configureWidget"
+            android:theme="@style/AppBaseTheme.Dialog.Dark">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".MyAppWidget">
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/showbookmark_appwidget_provider" />
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".notes.NoteListActivity"
+            android:label="@string/title_note_list"
+            android:parentActivityName=".BiblesOffline"
+            android:theme="@style/AppBaseTheme.AppCompat.Dark">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.felixunlimited.pbbible.BiblesOffline" />
+        </activity>
+        <activity
+            android:name=".notes.NoteDetailActivity"
+            android:label="@string/title_note_detail"
+            android:parentActivityName=".notes.NoteListActivity"
+            android:theme="@style/Theme.AppCompat">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.felixunlimited.pbbible.notes.NoteListActivity" />
+        </activity>
+
+        <service
+            android:name=".RandomMonthlyTheme"
+            android:enabled="true"
+            android:exported="true"/>
+    </application>
+
+</manifest>

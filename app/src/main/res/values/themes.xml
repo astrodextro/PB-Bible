@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppBaseTheme" parent="Theme.AppCompat">
+    </style>
+
+
+    <style name="AppBaseTheme.Dark">
+        <item name="textBible">@style/text_dark</item>
+    </style>
+    <style name="AppBaseTheme.Light">
+        <item name="textBible">@style/text_light</item>
+    </style>
+
+    <!--No Title Bar Theme-->
+    <style name="AppBaseTheme.Dark.NoTitleBar" parent="@android:style/Theme.NoTitleBar">
+        <item name="textBible">@style/text_dark</item>
+    </style>
+    <style name="AppBaseTheme.Light.NoTitleBar" parent="@android:style/Theme.NoTitleBar">
+        <item name="textBible">@style/text_light</item>
+    </style>
+
+    <!--Holo Theme Theme-->
+    <style name="AppBaseTheme.Holo.Dark" parent="@android:style/Theme.Holo">
+        <item name="textBible">@style/text_dark</item>
+    </style>
+    <style name="AppBaseTheme.Holo.Light" parent="@android:style/Theme.Holo.Light">
+        <item name="textBible">@style/text_light</item>
+    </style>
+
+    <!--Dialog theme-->
+    <style name="AppBaseTheme.Dialog.Light" parent="@android:style/Theme.Dialog">
+        <item name="textBible">@style/text_light</item>
+    </style>
+    <style name="AppBaseTheme.Dialog.Dark" parent="@android:style/Theme.Dialog">
+        <item name="textBible">@style/text_dark</item>
+    </style>
+
+    <!--AppCompat Dialog theme-->
+    <style name="AppBaseTheme.AppCompat.Dialog.Light" parent="@style/Theme.AppCompat.Light.Dialog">
+        <item name="textBible">@style/text_light</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="colorButtonNormal">@color/white</item>
+    </style>
+    <style name="AppBaseTheme.AppCompat.Dialog.Dark" parent="@style/Theme.AppCompat.Dialog">
+        <item name="textBible">@style/text_light</item>
+    </style>
+
+    <style name="SpinnerStyle">
+        <!--<item name="android:spinnerDropDownItemStyle">@style/Widget.AppCompat.Light.DropDownItem.Spinner</item>-->
+        <!--<item name="android:spinnerItemStyle">@style/Widget.AppCompat.TextView.SpinnerItem</item>-->
+        <!--<item name="android:dropDownSpinnerStyle">@style/Widget.AppCompat.Spinner.DropDown</item>-->
+        <!--<item name="android:spinnersShown">true</item>-->
+        <!--<item name="android:colorBackground">?attr/colorBackgroundFloating</item>-->
+        <!--<item name="android:colorBackgroundCacheHint">@null</item>-->
+
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowTitleStyle">@style/RtlOverlay.DialogWindowTitle.AppCompat</item>
+        <item name="android:windowTitleBackgroundStyle">@style/Base.DialogWindowTitleBackground.AppCompat</item>
+        <item name="android:windowBackground">@drawable/abc_dialog_material_background</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@style/Animation.AppCompat.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+
+        <item name="listPreferredItemPaddingLeft">24dip</item>
+        <item name="listPreferredItemPaddingRight">24dip</item>
+
+        <item name="android:listDivider">@null</item>
+    </style>
+
+    <style name="ListenStyle" parent="AppBaseTheme">
+        <item name="android:colorBackground">?attr/colorBackgroundFloating</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
+        <item name="android:windowFrame">@null</item>
+        <item name="android:spinnerDropDownItemStyle">@null</item>
+        <item name="android:spinnerItemStyle">@null</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:spinnerStyle">@style/Widget.AppCompat.Spinner</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@style/Animation.AppCompat.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+
+    </style>
+
+    <!--AppCompat theme-->
+    <style name="AppBaseTheme.AppCompat.Light" parent="Theme.AppCompat.Light">
+        <item name="textBible">@style/text_light</item>
+    </style>
+    <style name="AppBaseTheme.AppCompat.Dark" parent="Theme.AppCompat">
+        <item name="textBible">@style/text_dark</item>
+    </style>
+</resources>
+
