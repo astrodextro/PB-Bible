@@ -10,6 +10,7 @@ public class Bookmark {
 	private String content;
 	private String bible;
 	private String bookmarkDate;
+	private int isHighlight;
 	
 	//not persist
 	private String categoryName;
@@ -73,6 +74,10 @@ public class Bookmark {
 	}
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
+	}
+	public Integer getHighlighted () {return isHighlight;}
+	public void setHighlighted (Integer isHighlight) {
+		this.isHighlight = isHighlight;
 	}
 	@Override
 	public int hashCode() {

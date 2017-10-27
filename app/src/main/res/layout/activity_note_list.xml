@@ -6,9 +6,11 @@
     android:name="com.felixunlimited.pbbible.notes.NoteListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="30dp"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
-    android:layout_marginBottom="30dp"
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.felixunlimited.pbbible.notes.NoteListActivity"
     tools:listitem="@layout/note_list_content" />

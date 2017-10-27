@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "C:\\Felix I-O\\PB-Bible\\wear\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-w240dp-v13\\values-w240dp-v13.xml",
+        "outputFile": "C:\\FelixIO\\PB-Bible\\wear\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-w240dp-v13\\values-w240dp-v13.xml",
         "map": [
             {
                 "to": {
@@ -11,7 +11,7 @@
                     "endOffset": 102
                 },
                 "from": {
-                    "file": "C:\\Users\\Ando\\.android\\build-cache\\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\\output\\res\\values-w240dp-v13\\values.xml",
+                    "file": "C:\\Users\\Ando\\.android\\build-cache\\6ad2e03bb768324f574d153acca1c96baaabf982\\output\\res\\values-w240dp-v13\\values.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 0,
@@ -30,7 +30,7 @@
                     "endOffset": 154
                 },
                 "from": {
-                    "file": "C:\\Users\\Ando\\.android\\build-cache\\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\\output\\res\\values-w240dp-v13\\values.xml",
+                    "file": "C:\\Users\\Ando\\.android\\build-cache\\6ad2e03bb768324f574d153acca1c96baaabf982\\output\\res\\values-w240dp-v13\\values.xml",
                     "position": {
                         "startLine": 5,
                         "startColumn": 0,
@@ -49,7 +49,7 @@
                     "endOffset": 208
                 },
                 "from": {
-                    "file": "C:\\Users\\Ando\\.android\\build-cache\\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\\output\\res\\values-w240dp-v13\\values.xml",
+                    "file": "C:\\Users\\Ando\\.android\\build-cache\\6ad2e03bb768324f574d153acca1c96baaabf982\\output\\res\\values-w240dp-v13\\values.xml",
                     "position": {
                         "startLine": 6,
                         "startColumn": 0,
@@ -68,7 +68,7 @@
                     "endOffset": 260
                 },
                 "from": {
-                    "file": "C:\\Users\\Ando\\.android\\build-cache\\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\\output\\res\\values-w240dp-v13\\values.xml",
+                    "file": "C:\\Users\\Ando\\.android\\build-cache\\6ad2e03bb768324f574d153acca1c96baaabf982\\output\\res\\values-w240dp-v13\\values.xml",
                     "position": {
                         "startLine": 7,
                         "startColumn": 0,

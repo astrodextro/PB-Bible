@@ -16,10 +16,8 @@ import java.util.List;
 
 public class Voice extends Activity {
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
-    private String currentBookLanguage;
     private int currentChapterIdx;
     private int currentVerseIdx;
-    private String[] matches;
     Button btnSay;
 
     @Override
@@ -28,7 +26,7 @@ public class Voice extends Activity {
         Util.setTheme(this, R.style.AppBaseTheme_Dialog_Light);
         setContentView(R.layout.activity_voice);
         readPreference();
-        btnSay = (Button) findViewById(R.id.btnSay);
+        btnSay = findViewById(R.id.btnSay);
         btnSay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,8 +38,8 @@ public class Voice extends Activity {
 
     private void readPreference() {
         SharedPreferences preference = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE);
-        currentBookLanguage = preference.getString(Constants.BOOK_LANGUAGE, Constants.LANG_ENGLISH);
-        currentChapterIdx = preference.getInt(Constants.POSITION_CHAPTER, 0);
+        //String currentBookLanguage = preference.getString(Constants.BOOK_LANGUAGE, Constants.LANG_ENGLISH);
+        currentChapterIdx = preference.getInt(Constants.CHAPTER_INDEX, 0);
         currentVerseIdx = preference.getInt(Constants.POSITION_VERSE, 0);
     }
 
@@ -101,7 +99,7 @@ public class Voice extends Activity {
 //                }
 
                 if (!textMatchList.isEmpty()) {
-                    matches = new String[textMatchList.size()];
+                    String[] matches = new String[textMatchList.size()];
                     matches = textMatchList.toArray(matches);
                     // If first Match contains the 'search' word
                     // Then start web search.
@@ -130,9 +128,9 @@ public class Voice extends Activity {
                             else if (match.contains("first")) {
                                 for (int j = 0; j < Constants.booksWithMultipleVariants.length; j++) {
                                     String nextWord = match.split("first ")[1].split(" ")[0];
-                                    if (nextWord.equals(Constants.booksWithMultipleVariants[j])) {
+                                    if (nextWord.toLowerCase().equals(Constants.booksWithMultipleVariants[j].toLowerCase())) {
                                         showToastMessage("matched");
-                                        goToBook("1 "+Constants.booksWithMultipleVariants[j], com.felixunlimited.pbbible.Util.getChapterAndVerse(match.split(Constants.booksWithMultipleVariants[j])[1]));
+                                        goToBook("1 "+Constants.booksWithMultipleVariants[j], com.felixunlimited.pbbible.Util.getChapterAndVerse(match.split(Constants.booksWithMultipleVariants[j].toLowerCase())[1]));
                                         break outerLoop;
                                     }
                                 }
@@ -140,9 +138,9 @@ public class Voice extends Activity {
                             else if (match.contains("1st")) {
                                 for (int j = 0; j < Constants.booksWithMultipleVariants.length; j++) {
                                     String nextWord = match.split("1st ")[1].split(" ")[0];
-                                    if (nextWord.equals(Constants.booksWithMultipleVariants[j])) {
+                                    if (nextWord.toLowerCase().equals(Constants.booksWithMultipleVariants[j].toLowerCase())) {
                                         showToastMessage("matched");
-                                        goToBook("1 "+Constants.booksWithMultipleVariants[j], com.felixunlimited.pbbible.Util.getChapterAndVerse(match.split(Constants.booksWithMultipleVariants[j])[1]));
+                                        goToBook("1 "+Constants.booksWithMultipleVariants[j], com.felixunlimited.pbbible.Util.getChapterAndVerse(match.split(Constants.booksWithMultipleVariants[j].toLowerCase())[1]));
                                         break outerLoop;
                                     }
                                 }
@@ -150,9 +148,9 @@ public class Voice extends Activity {
                             else if (match.contains("second")) {
                                 for (int j = 0; j < Constants.booksWithMultipleVariants.length; j++) {
                                     String nextWord = match.split("second ")[1].split(" ")[0];
-                                    if (nextWord.equals(Constants.booksWithMultipleVariants[j])) {
+                                    if (nextWord.toLowerCase().equals(Constants.booksWithMultipleVariants[j].toLowerCase())) {
                                         showToastMessage("matched");
-                                        goToBook("2 "+Constants.booksWithMultipleVariants[j], com.felixunlimited.pbbible.Util.getChapterAndVerse(match.split(Constants.booksWithMultipleVariants[j])[1]));
+                                        goToBook("2 "+Constants.booksWithMultipleVariants[j], com.felixunlimited.pbbible.Util.getChapterAndVerse(match.split(Constants.booksWithMultipleVariants[j].toLowerCase())[1]));
                                         break outerLoop;
                                     }
                                 }
@@ -160,9 +158,9 @@ public class Voice extends Activity {
                             else if (match.contains("2nd")) {
                                 for (int j = 0; j < Constants.booksWithMultipleVariants.length; j++) {
                                     String nextWord = match.split("2nd ")[1].split(" ")[0];
-                                    if (nextWord.equals(Constants.booksWithMultipleVariants[j])) {
+                                    if (nextWord.toLowerCase().equals(Constants.booksWithMultipleVariants[j].toLowerCase())) {
                                         showToastMessage("matched");
-                                        goToBook("2 "+Constants.booksWithMultipleVariants[j], com.felixunlimited.pbbible.Util.getChapterAndVerse(match.split(Constants.booksWithMultipleVariants[j])[1]));
+                                        goToBook("2 "+Constants.booksWithMultipleVariants[j], com.felixunlimited.pbbible.Util.getChapterAndVerse(match.split(Constants.booksWithMultipleVariants[j].toLowerCase())[1]));
                                         break outerLoop;
                                     }
                                 }
@@ -172,7 +170,8 @@ public class Voice extends Activity {
                                 goToBook("3 John", com.felixunlimited.pbbible.Util.getChapterAndVerse(match.replace("third john", "").replace("3rd john", "")));
                                 break outerLoop;
                             }
-                            n++;
+                            else
+                                n++;
                         }
                     }
 
@@ -228,8 +227,8 @@ public class Voice extends Activity {
             searchBook = searchBook.replaceAll(" ", "");
             searchBook = searchBook.toLowerCase();
 
-            String[] firstSearch = null;
-            String[] secondSearch = null;
+            String[] firstSearch;
+            String[] secondSearch;
 
             firstSearch = Constants.arrActiveBookName;
             secondSearch = Constants.arrActiveBookAbbr;
@@ -283,7 +282,7 @@ public class Voice extends Activity {
         searchBook = Constants.arrActiveBookName[goBook-1];
         SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
         editor.putInt(Constants.POSITION_BOOK, goBook);
-        editor.putInt(Constants.POSITION_CHAPTER, currentChapterIdx);
+        editor.putInt(Constants.CHAPTER_INDEX, currentChapterIdx);
         editor.putInt(Constants.POSITION_VERSE, currentVerseIdx);
         editor.apply();
         com.felixunlimited.pbbible.notes.Util.saveFromVoice(this, searchBook+" "+goChapter+":"+goVerse+"");

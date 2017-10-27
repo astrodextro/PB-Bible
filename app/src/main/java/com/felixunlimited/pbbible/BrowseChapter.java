@@ -101,7 +101,7 @@ public class BrowseChapter extends ExpandableListActivity {
     	int chapter = groupPosition * 10 + childPosition + 1;
     	int chapterIndex = (Constants.arrBookStart[bookNumber-1]) + (chapter - 1);
     	Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
-		editor.putInt(Constants.POSITION_CHAPTER, chapterIndex);
+		editor.putInt(Constants.CHAPTER_INDEX, chapterIndex);
 		editor.commit();
 		Intent resultIntent = new Intent(this, BrowseBook.class);
     	setResult(Activity.RESULT_OK, resultIntent);

@@ -84,31 +84,31 @@
 			android:visibility="gone"/>
 </LinearLayout>
 
-<LinearLayout
-android:id="@+id/horizontalLine"
-android:layout_width="fill_parent"
-android:layout_height="2dip"
-android:background="#AABBCC"
-android:visibility="gone"
-	android:orientation="horizontal" />
+	<LinearLayout
+		android:id="@+id/horizontalLine"
+		android:layout_width="fill_parent"
+		android:layout_height="5dip"
+		android:background="#AABBCC"
+		android:orientation="horizontal"
+		android:visibility="gone" />
 
 <LinearLayout
-	android:id="@+id/linearParallel" 
-    android:layout_height="0px" 
+	android:id="@+id/linearParallel"
+    android:layout_height="0px"
     android:layout_width="fill_parent"
 	android:orientation="vertical">
-<ListView android:id="@+id/listviewParallel"
-	android:layout_height="fill_parent" 
-    android:layout_width="fill_parent"
-    android:dividerHeight="0px"
-    android:divider="@null"
->
-</ListView>
-<TextView android:id="@+id/txtEmpty2"
-	android:textSize="15sp" 
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:visibility="gone"/>
+
+	<ListView
+		android:id="@+id/listviewParallel"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"
+		android:dividerHeight="0px"
+		android:divider="@null" />
+	<TextView android:id="@+id/txtEmpty2"
+		android:textSize="15sp"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:visibility="gone"/>
 </LinearLayout>
  
 <LinearLayout

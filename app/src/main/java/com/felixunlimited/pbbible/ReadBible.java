@@ -621,7 +621,7 @@ public class ReadBible extends ListActivity implements OnClickListener, OnItemCl
 						sbLine.insert(0, "\n");
 					}
 					prevVerseListIndex = verseList.size();
-					verseList.add(new DisplayVerse(0, sbLine.toString(), false, false));
+					verseList.add(new DisplayVerse(0, sbLine.toString(), false, 0, false));
 					prevChapterIdx = helper.getChapterIndex();
 					ctrVerse = 0;
 				} else {
@@ -686,9 +686,9 @@ public class ReadBible extends ListActivity implements OnClickListener, OnItemCl
 					}
 					
 					if (prevBreakParagraph) {
-						verseList.add(new DisplayVerse(ctrVerse, line, bookmarked, true, helper.getChapterIndex()));
+						verseList.add(new DisplayVerse(ctrVerse, line, bookmarked, 0, true, helper.getChapterIndex()));
 					} else {
-						verseList.add(new DisplayVerse(ctrVerse, line, bookmarked, false, helper.getChapterIndex()));
+						verseList.add(new DisplayVerse(ctrVerse, line, bookmarked, 0, false, helper.getChapterIndex()));
 					}
 					prevBreakParagraph = breakParagraph;
 				}

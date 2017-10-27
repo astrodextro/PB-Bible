@@ -217,7 +217,7 @@ public class DatabaseHelper {
 			db.execSQL("CREATE TABLE category(id INTEGER PRIMARY KEY, category_name TEXT);");
 			db.execSQL("CREATE TABLE scriptures(id INTEGER PRIMARY KEY AUTOINCREMENT, scripture TEXT, category TEXT, timestamp TEXT);");
 			db.execSQL("CREATE UNIQUE INDEX idx_category_1 ON category(category_name);");
-			db.execSQL("CREATE TABLE bookmark(id INTEGER PRIMARY KEY, category_id INTEGER, book INTEGER, chapter INTEGER, verse_start INTEGER, verse_end INTEGER, content TEXT, bible TEXT, bookmark_date TEXT);");
+			db.execSQL("CREATE TABLE bookmark(id INTEGER PRIMARY KEY, highlighted INTEGER, category_id INTEGER, book INTEGER, chapter INTEGER, verse_start INTEGER, verse_end INTEGER, content TEXT, bible TEXT, bookmark_date TEXT);");
 			db.execSQL("CREATE INDEX idx_bookmark_1 ON bookmark(category_id);");
 			db.execSQL("CREATE INDEX idx_bookmark_2 ON bookmark(book, chapter, verse_start);");
 			db.execSQL("CREATE TABLE read_history(id INTEGER PRIMARY KEY, chapter_index INTEGER);");
@@ -260,7 +260,7 @@ public class DatabaseHelper {
 		db.execSQL("DROP TABLE IF EXISTS bookmark");
 		db.execSQL("DROP TABLE IF EXISTS category");
 		db.execSQL("CREATE TABLE category(id INTEGER PRIMARY KEY, category_name TEXT);");
-		db.execSQL("CREATE TABLE bookmark(id INTEGER PRIMARY KEY, category_id INTEGER, book INTEGER, chapter INTEGER, verse_start INTEGER, verse_end INTEGER, content TEXT, bible TEXT, bookmark_date TEXT);");
+		db.execSQL("CREATE TABLE bookmark(id INTEGER PRIMARY KEY, highlighted INTEGER, category_id INTEGER, book INTEGER, chapter INTEGER, verse_start INTEGER, verse_end INTEGER, content TEXT, bible TEXT, bookmark_date TEXT);");
 	}
 	
 	public void createBookmarkIndexes() {
@@ -271,15 +271,15 @@ public class DatabaseHelper {
 
 	
 	public void insertBookmark(Bookmark bm) {
-		String insertSql = "INSERT INTO bookmark(category_id, book, chapter, verse_start, verse_end, content, bible, bookmark_date)" +
-			" values (?,?,?,?,?,?,?,?);";
-		db.execSQL(insertSql, new Object[] {bm.getCategoryId(), bm.getBook(), bm.getChapter(), bm.getVerseStart(), bm.getVerseEnd(), 
+		String insertSql = "INSERT INTO bookmark(category_id, highlighted, book, chapter, verse_start, verse_end, content, bible, bookmark_date)" +
+			" values (?,?,?,?,?,?,?,?,?);";
+		db.execSQL(insertSql, new Object[] {bm.getCategoryId(), bm.getHighlighted(), bm.getBook(), bm.getChapter(), bm.getVerseStart(), bm.getVerseEnd(),
 			bm.getContent(), bm.getBible(), bm.getBookmarkDate()});
 	}
 	
 	public void getBookmarkList(List<Bookmark> result, String categoryName, String sortBy, String bible) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT b.id, b.category_id, b.book, b.chapter, b.verse_start, b.verse_end, b.content, b.bible, b.bookmark_date")
+		sb.append("SELECT b.id, b.category_id, b.highlighted, b.book, b.chapter, b.verse_start, b.verse_end, b.content, b.bible, b.bookmark_date")
 		  .append(" FROM bookmark b")
 		  .append(" INNER JOIN category c on c.id=b.category_id")
 		  .append(" WHERE c.category_name=?")
@@ -318,11 +318,12 @@ public class DatabaseHelper {
 		while (cursor.moveToNext()) {
 			Bookmark bm = new Bookmark();
 			bm.setId(cursor.getLong(0));
-			bm.setCategoryId(cursor.getLong(1));
-			bm.setBook(cursor.getInt(2));
-			bm.setChapter(cursor.getInt(3));
-			bm.setVerseStart(cursor.getInt(4));
-			bm.setVerseEnd(cursor.getInt(5));
+			bm.setHighlighted(cursor.getInt(1));
+			bm.setCategoryId(cursor.getLong(2));
+			bm.setBook(cursor.getInt(3));
+			bm.setChapter(cursor.getInt(4));
+			bm.setVerseStart(cursor.getInt(5));
+			bm.setVerseEnd(cursor.getInt(6));
 			if (!bible.equals(Constants.SHOW_BIBLE_AS_BOOKMARKED)) {
 				bm.setBible(bibleName);
 				int chapterIdx = Constants.arrBookStart[bm.getBook()-1] + bm.getChapter()-1;
@@ -363,10 +364,10 @@ public class DatabaseHelper {
 				}
 				
 			} else {
-				bm.setContent(cursor.getString(6));
-				bm.setBible(cursor.getString(7));
+				bm.setContent(cursor.getString(7));
+				bm.setBible(cursor.getString(8));
 			}
-			bm.setBookmarkDate(cursor.getString(8));
+			bm.setBookmarkDate(cursor.getString(9));
 			result.add(bm);
 		}
 		cursor.close();
@@ -392,14 +393,14 @@ public class DatabaseHelper {
 			Collections.sort(result, new BookmarkDateDescComparator());
 		}
 	}
-	
+
 	public List<Integer> getBookmarkVerseStartByChapterIndex(int chapterIndex) {
 		List<Integer> result = new ArrayList<Integer>();
 		String[] arrBookChapter = Constants.arrVerseCount[chapterIndex].split(";");
-		
+
 		Cursor cursor = db.rawQuery("SELECT b.verse_start FROM bookmark b" +
-			" WHERE b.book=? and b.chapter=?" +
-			" ORDER BY b.verse_start", new String[] {arrBookChapter[0], arrBookChapter[1]});
+				" WHERE b.book=? and b.chapter=?" +
+				" ORDER BY b.verse_start", new String[] {arrBookChapter[0], arrBookChapter[1]});
 		result.clear();
 		while (cursor.moveToNext()) {
 			result.add(cursor.getInt(0));
@@ -407,7 +408,29 @@ public class DatabaseHelper {
 		cursor.close();
 		return result;
 	}
-	
+	public List<Integer> getHighlightVerseStartByChapterIndex(int chapterIndex) {
+		List<Integer> result = new ArrayList<Integer>();
+		String[] arrBookChapter = Constants.arrVerseCount[chapterIndex].split(";");
+
+		Cursor cursor = db.rawQuery("SELECT b.highlighted, b.verse_start FROM bookmark b" +
+				" WHERE b.book=? and b.chapter=?" +
+				" ORDER BY b.verse_start", new String[] {arrBookChapter[0], arrBookChapter[1]});
+		result.clear();
+		for (int i = 0; i < Integer.parseInt(arrBookChapter[2]); i++) {
+			cursor.moveToFirst();
+			while (cursor.moveToNext()) {
+				if (cursor.getInt(1) == i+1) {
+					result.add(cursor.getInt(0));
+					break;
+				}
+				else
+					result.add(0);
+			}
+		}
+		cursor.close();
+		return result;
+	}
+
 	public Long getCategoryIdByCategoryName(String name) {
 		Cursor cursor = db.rawQuery("SELECT id FROM category WHERE category_name=?", new String[] {name});
 		Long result = null;
@@ -452,7 +475,7 @@ public class DatabaseHelper {
 	}
 	
 	public Bookmark getBookmark(int book, int chapter, int verseStart) {
-		Cursor cursor = db.rawQuery("SELECT b.id, b.category_id, b.book, b.chapter, b.verse_start, b.verse_end, b.content, b.bible, b.bookmark_date, " +
+		Cursor cursor = db.rawQuery("SELECT b.id, b.highlighted, b.category_id, b.book, b.chapter, b.verse_start, b.verse_end, b.content, b.bible, b.bookmark_date, " +
 			" c.category_name" +
 			" FROM bookmark b" +
 			" INNER JOIN category c on c.id=b.category_id" +
@@ -461,15 +484,16 @@ public class DatabaseHelper {
 		while (cursor.moveToNext()) {
 			result = new Bookmark();
 			result.setId(cursor.getLong(0));
-			result.setCategoryId(cursor.getLong(1));
-			result.setBook(cursor.getInt(2));
-			result.setChapter(cursor.getInt(3));
-			result.setVerseStart(cursor.getInt(4));
-			result.setVerseEnd(cursor.getInt(5));
-			result.setContent(cursor.getString(6));
-			result.setBible(cursor.getString(7));
-			result.setBookmarkDate(cursor.getString(8));
-			result.setCategoryName(cursor.getString(9));
+			result.setHighlighted(cursor.getInt(1));
+			result.setCategoryId(cursor.getLong(2));
+			result.setBook(cursor.getInt(3));
+			result.setChapter(cursor.getInt(4));
+			result.setVerseStart(cursor.getInt(5));
+			result.setVerseEnd(cursor.getInt(6));
+			result.setContent(cursor.getString(7));
+			result.setBible(cursor.getString(8));
+			result.setBookmarkDate(cursor.getString(9));
+			result.setCategoryName(cursor.getString(10));
 		}
 		cursor.close();
 		return result;
@@ -498,7 +522,7 @@ public class DatabaseHelper {
 	}
 	
 	public List<Bookmark> getAllBookmarksForExport() {
-		Cursor cursor = db.rawQuery("SELECT b.id, b.category_id, b.book, b.chapter, b.verse_start, b.verse_end, b.content, b.bible, b.bookmark_date, " +
+		Cursor cursor = db.rawQuery("SELECT b.id, b.highlighted, b.category_id, b.book, b.chapter, b.verse_start, b.verse_end, b.content, b.bible, b.bookmark_date, " +
 				" c.category_name" +
 				" FROM bookmark b" +
 				" INNER JOIN category c on c.id=b.category_id" +
@@ -507,15 +531,16 @@ public class DatabaseHelper {
 		while (cursor.moveToNext()) {
 			Bookmark bm = new Bookmark();
 			bm.setId(cursor.getLong(0));
-			bm.setCategoryId(cursor.getLong(1));
-			bm.setBook(cursor.getInt(2));
-			bm.setChapter(cursor.getInt(3));
-			bm.setVerseStart(cursor.getInt(4));
-			bm.setVerseEnd(cursor.getInt(5));
-			bm.setContent(cursor.getString(6));
-			bm.setBible(cursor.getString(7));
-			bm.setBookmarkDate(cursor.getString(8));
-			bm.setCategoryName(cursor.getString(9));
+			bm.setHighlighted(cursor.getInt(1));
+			bm.setCategoryId(cursor.getLong(2));
+			bm.setBook(cursor.getInt(3));
+			bm.setChapter(cursor.getInt(4));
+			bm.setVerseStart(cursor.getInt(5));
+			bm.setVerseEnd(cursor.getInt(6));
+			bm.setContent(cursor.getString(7));
+			bm.setBible(cursor.getString(8));
+			bm.setBookmarkDate(cursor.getString(9));
+			bm.setCategoryName(cursor.getString(10));
 			result.add(bm);
 		}
 		cursor.close();
@@ -564,23 +589,28 @@ public class DatabaseHelper {
 	}
 	
 	public Bookmark getRandomBookmark() {
-		Cursor cursor = db.rawQuery("SELECT b.id, b.category_id, b.book, b.chapter, b.verse_start, b.verse_end, b.content, b.bible, b.bookmark_date "+			
+		Cursor cursor = db.rawQuery("SELECT b.id, b.highlighted, b.category_id, b.book, b.chapter, b.verse_start, b.verse_end, b.content, b.bible, b.bookmark_date "+
 			" FROM bookmark b" +
 			" ORDER BY RANDOM() limit 1", null);
 		Bookmark result = null;
 		while (cursor.moveToNext()) {
 			result = new Bookmark();
 			result.setId(cursor.getLong(0));
-			result.setCategoryId(cursor.getLong(1));
-			result.setBook(cursor.getInt(2));
-			result.setChapter(cursor.getInt(3));
-			result.setVerseStart(cursor.getInt(4));
-			result.setVerseEnd(cursor.getInt(5));
-			result.setContent(cursor.getString(6));
-			result.setBible(cursor.getString(7));
-			result.setBookmarkDate(cursor.getString(8));
+			result.setHighlighted(cursor.getInt(1));
+			result.setCategoryId(cursor.getLong(2));
+			result.setBook(cursor.getInt(3));
+			result.setChapter(cursor.getInt(4));
+			result.setVerseStart(cursor.getInt(5));
+			result.setVerseEnd(cursor.getInt(6));
+			result.setContent(cursor.getString(7));
+			result.setBible(cursor.getString(8));
+			result.setBookmarkDate(cursor.getString(9));
 		}
 		cursor.close();
 		return result;
+	}
+
+	public Cursor getBaeScriptures () {
+		return db.rawQuery("SELECT * FROM scriptures", null);
 	}
 }

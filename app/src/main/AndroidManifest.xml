@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +20,7 @@
         <activity
             android:name=".Voice"
             android:label="Speak"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
             android:name=".speech.PocketSphinxActivity"
@@ -38,11 +40,13 @@
             android:name=".About"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/about_title"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
             android:name=".AboutBible"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/aboutbible_title"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
             android:name=".Bookmarks"
@@ -73,17 +77,20 @@
             android:name=".Help"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/help_title"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
             android:name=".GoTo"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/goto_title"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark"
             android:windowSoftInputMode="stateAlwaysVisible" />
         <activity
             android:name=".SelectParallelBible"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/selectParallel_title"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
             android:name=".BrowseBook"
@@ -106,6 +113,7 @@
             android:name=".AboutDocument"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/aboutdocument_title"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
             android:name=".ReadBible"
@@ -119,6 +127,7 @@
         <activity
             android:name=".ConfigureWidget"
             android:label="@string/configureWidget"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -168,13 +177,16 @@
             android:label="@string/title_activity_general_speech_recognizer" />
         <activity
             android:name=".browse.BrowseBible"
+            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.AppCompat.Dialog.Dark" />
         <activity
             android:name=".speech.Listen"
             android:label="@string/title_activity_listen"
             android:parentActivityName=".BiblesOffline"
+            android:screenOrientation="locked"
             android:theme="@android:style/Theme.Dialog">
-            <meta-data android:name="android.app.searchable"
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -188,6 +200,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.felixunlimited.pbbible.BiblesOffline" />
         </activity>
+        <activity
+            android:name=".SplashScreen"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_splash_screen"
+            android:parentActivityName=".BiblesOffline"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.felixunlimited.pbbible.BiblesOffline" />
+        </activity>
+        <activity android:name=".PDFViewer"></activity>
     </application>
 
 </manifest>

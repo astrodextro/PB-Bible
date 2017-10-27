@@ -515,7 +515,7 @@ public class Bookmarks extends ListActivity implements OnClickListener, OnItemSe
 		   if (bm == null) return;
 		   Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
 		   int chapterIdx = Constants.arrBookStart[bm.getBook()-1] + bm.getChapter()-1;
-		   editor.putInt(Constants.POSITION_CHAPTER, chapterIdx);
+		   editor.putInt(Constants.CHAPTER_INDEX, chapterIdx);
 		   editor.putString(Constants.POSITION_BIBLE_NAME, bm.getBible() + ".ont");
 		   editor.commit();
 	       Intent showBibleActivity = new Intent(this, BiblesOffline.class);

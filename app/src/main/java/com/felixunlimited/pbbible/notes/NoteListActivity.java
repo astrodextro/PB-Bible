@@ -232,6 +232,9 @@ public class NoteListActivity extends AppCompatActivity {
                 holder.mSpeakerView.setText(note.speaker);
                 holder.mContentView.setText(Util.firstLine(note.content));
                 holder.mModifiedView.setText("edited: "+Util.formatDate(Long.parseLong(note.modified)));
+
+                if (note.speaker.equals(""))
+                    holder.mSpeakerView.setVisibility(View.GONE);
             }
 
             holder.mView.setOnClickListener(new View.OnClickListener() {

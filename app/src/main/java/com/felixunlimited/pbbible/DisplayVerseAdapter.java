@@ -1,6 +1,7 @@
 package com.felixunlimited.pbbible;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -24,6 +25,9 @@ public class DisplayVerseAdapter extends ArrayAdapter<DisplayVerse> implements O
 	private List<DisplayVerse> verseList = new ArrayList<DisplayVerse>();
 	private int currentFontSize;
 	private Context context;
+	private SharedPreferences sharedPreferences;
+	private int currentChapterIdx;
+	private int highlight;
 
 	public DisplayVerseAdapter(Context context, int textViewResourceId,
 			List<DisplayVerse> verseList, int currentFontSize) {
@@ -31,6 +35,8 @@ public class DisplayVerseAdapter extends ArrayAdapter<DisplayVerse> implements O
 		this.context = context;
 		this.verseList = verseList;
 		this.currentFontSize = currentFontSize;
+		this.sharedPreferences = context.getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE);
+		this.currentChapterIdx = sharedPreferences.getInt(Constants.CHAPTER_INDEX, 0);
 	}
 	
 	public void updateFontSize(int fontSize) {
@@ -40,6 +46,7 @@ public class DisplayVerseAdapter extends ArrayAdapter<DisplayVerse> implements O
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
+		highlight = sharedPreferences.getInt((currentChapterIdx+""+position+1), 0);
 		if (v == null) {
             LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.row, null);
@@ -49,6 +56,10 @@ public class DisplayVerseAdapter extends ArrayAdapter<DisplayVerse> implements O
             TextView txtVerse = (TextView) v.findViewById(R.id.txtVerse);
             txtVerse.setMovementMethod(LinkMovementMethod.getInstance());
             txtVerse.setText(parseVerseForDisplay(verse, v));
+//			if (highlight == 1)
+//				txtVerse.setBackgroundColor(Color.BLUE);
+//			else
+//				txtVerse.setBackgroundColor(Color.TRANSPARENT);
             txtVerse.setTextSize(currentFontSize);
         }
         v.setOnCreateContextMenuListener(this);
@@ -217,6 +228,10 @@ public class DisplayVerseAdapter extends ArrayAdapter<DisplayVerse> implements O
 			spanBookmark.setSpan(imageSpan, spaceBeforeIcon.length()-4, spaceBeforeIcon.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 			txtBookmark.setTextSize(currentFontSize);
 			txtBookmark.setText(spanBookmark);
+//			if (highlight ==1)
+//				txtBookmark.setBackgroundColor(Color.BLUE);
+//			else
+//				txtBookmark.setBackgroundColor(Color.TRANSPARENT);
 		} else {
 			txtBookmark.setText("");
 		}

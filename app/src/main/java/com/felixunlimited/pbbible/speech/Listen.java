@@ -4,14 +4,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.Voice;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -43,11 +46,13 @@ import static com.felixunlimited.pbbible.Constants.BIBLE_FOLDER;
 import static com.felixunlimited.pbbible.Constants.BOOK_LANGUAGE;
 import static com.felixunlimited.pbbible.Constants.LANG_ENGLISH;
 import static com.felixunlimited.pbbible.Constants.POSITION_BIBLE_NAME;
-import static com.felixunlimited.pbbible.Constants.POSITION_CHAPTER;
+import static com.felixunlimited.pbbible.Constants.CHAPTER_INDEX;
 import static com.felixunlimited.pbbible.Constants.PREFERENCE_NAME;
 import static com.felixunlimited.pbbible.Constants.arrVerseCount;
 
-public class Listen extends Activity implements AdapterView.OnItemSelectedListener, TextToSpeech.OnInitListener, View.OnClickListener {
+public class Listen extends Activity implements AdapterView.OnItemSelectedListener,
+        TextToSpeech.OnInitListener,
+        View.OnClickListener{
     Spinner spnBook;
     Spinner spnChapter;
     Spinner spnVerseStart;
@@ -80,12 +85,16 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
     State ttsState;
     TextToSpeech tts;
 
+    Handler handler;
+
     final String TAG = "Listen Activity";
     public int currentBook;
     public int currentChapter;
     public int currentVerseStart;
     public int currentVerseEnd;
     public int currentVerseMax;
+    public int currentVerse;
+    public int initialBook;
     public int currentChapterIdx;
     public Locale currentLocale;
     public Voice currebtVoice;
@@ -100,16 +109,30 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listen);
+        handler = new Handler(Looper.getMainLooper());
         readPreference();
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         checkTTSAvailability();
+        populateVerseList(currentBibleFilename, currentChapterIdx);
         instantiateSpinners();
         initializeLists();
         createAdapters();
         instantiateButtons();
-        populateVerseList(currentBibleFilename, currentChapterIdx);
     }
 
+
+    private void readPreference() {
+        //SpeechRecognizer
+        SharedPreferences preference = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
+        currentChapterIdx = preference.getInt(CHAPTER_INDEX, 0);
+        if (currentChapterIdx < 0 || currentChapterIdx >= arrVerseCount.length) {
+            currentChapterIdx = 0;
+        }
+        currentBibleFilename = preference.getString(POSITION_BIBLE_NAME, "");
+
+        SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        currentBookLanguage = defaultPrefs.getString(BOOK_LANGUAGE, LANG_ENGLISH);
+    }
     public boolean isDoneSpeaking (ReentrantLock reentrantLock) {
         boolean isDone = false;
         if (!tts.isSpeaking()) {
@@ -132,66 +155,78 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
                 // success, create the TTS instance
 //                tts = new TextToSpeech(this, this, "com.google.android.tts");
                 tts = new TextToSpeech(this, this);
-//                tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
-//                    @Override
-//                    public void onUtteranceCompleted(String utteranceID) {
-//                        if (utteranceID.equals(FINISHED_UTTERANCE_ID)) {
-//                            ttsState = State.Stopped;
-//                            txtStatus.setText("Done");
-//                            btnPlayStop.setText("PLAY");
-//                        }
-//                    }
-//                });
-//                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-//                    @Override
-//                    public void onStart(String utteranceID) {
-//                        if (utteranceID.equals(FINISHED_UTTERANCE_ID)) {
-////                            ttsState = State.Stopped;
-////                            txtStatus.setText("Playing");
-////                            btnPlayStop.setText("STOP");
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onDone(String utteranceID) {
-//                        if (utteranceID.equals(FINISHED_UTTERANCE_ID)) {
-////                            if (switcAutoPlaey.isChecked()) {
-////                                currentChapterIdx++;
-////                                if (currentChapterIdx > Constants.arrVerseCount.length-1)
-////                                    currentChapterIdx = 0;
-////                                populateVerseList(currentBibleFilename,currentChapterIdx);
-////                                String[] arrBookChapterVerse = Constants.arrVerseCount[currentChapterIdx].split(";");
-////                                currentBook = Integer.parseInt(arrBookChapterVerse[0]);
-////                                currentChapter = Integer.parseInt(arrBookChapterVerse[1]);
-////                                currentVerseMax = Integer.parseInt(arrBookChapterVerse[2]);
-////                                currentVerseStart = 1;
-////                                currentVerseEnd = currentVerseMax;
-////                                isFromCode = true;
-////                                spnBook.setSelection(currentBook-1);
-////                                spnChapter.setSelection(currentChapter-1);
-////                                spnVerseStart.setSelection(currentVerseStart-1);
-////                                spnBook.setSelection(currentVerseEnd-1);
-////                                speak();
-////                            }
-////                            else if (switchRepeat.isChecked()) {
-////                                speak();
-////                            }
-//                            ttsState = State.Stopped;
-//                            txtStatus.setText("Done");
-//                            btnPlayStop.setText("PLAY");
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(String s) {
-//                        Toast.makeText(Listen.this, "errot "+ s, Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                    @Override
+                    public void onStart(String utteranceID) {
+                        if (utteranceID.equals(FINISHED_UTTERANCE_ID)) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ttsState = State.Playing;
+                                    txtStatus.setText("Playing");
+                                    btnPlayStop.setText("STOP");
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onDone(String utteranceID) {
+                        if (utteranceID.equals(FINISHED_UTTERANCE_ID)) {
+                            if (ttsState == State.Stopped)
+                                return;
+                            if (currentVerse != currentVerseEnd) {
+                                currentVerse++;
+                                speak();
+                                return;
+                            }
+
+                            else if (switcAutoPlaey.isChecked()) {
+                                if (currentVerseEnd != currentVerseMax) {
+                                    currentVerse++;
+                                    currentVerseEnd = currentVerseMax;
+                                }
+                                else {
+                                    currentChapterIdx++;
+                                    if (currentChapterIdx > Constants.arrVerseCount.length - 1)
+                                        currentChapterIdx = 0;
+                                    populateVerseList(currentBibleFilename, currentChapterIdx);
+                                    initializeLists();
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            createAdapters();
+                                            isFromCode = true;
+                                        }
+                                    });
+                                    currentVerse = 1;
+                                }
+                                speak();
+                            }
+                            else if (switchRepeat.isChecked()) {
+                                currentVerse = currentVerseStart;
+                                speak();
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ttsState = State.Stopped;
+                                    txtStatus.setText("Done");
+                                    btnPlayStop.setText("PLAY");
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onError(String s) {
+                        Toast.makeText(Listen.this, "error "+ s, Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 // missing data, install it
                 Intent installIntent = new Intent();
-                installIntent.setAction(
-                        TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
                 startActivity(installIntent);
             }
         }
@@ -211,14 +246,30 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
-
+                    switchRepeat.setChecked(false);
+                    ((ViewGroup)spnVerseEnd.getParent()).setVisibility(View.GONE);
+                    spnVerseEnd.setSelection(currentVerseMax-1);
+                }
+                else {
+                    if (((ViewGroup)spnVerseEnd.getParent()).getVisibility() == View.GONE)
+                        ((ViewGroup)spnVerseEnd.getParent()).setVisibility(View.VISIBLE);
                 }
             }
         });
         switchRepeat = (Switch) findViewById(R.id.repeat);
         switchRepeat.setChecked(false);
-        switcAutoPlaey.setVisibility(View.GONE);
-        switchRepeat.setVisibility(View.GONE);
+        switchRepeat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (isChecked) {
+                    switcAutoPlaey.setChecked(false);
+                    if (((ViewGroup)spnVerseEnd.getParent()).getVisibility() == View.GONE)
+                        ((ViewGroup)spnVerseEnd.getParent()).setVisibility(View.VISIBLE);
+                }
+            }
+        });
+//        switcAutoPlaey.setVisibility(View.GONE);
+//        switchRepeat.setVisibility(View.GONE);
         btnPlayStop = (Button) findViewById(R.id.btnPlayStop);
         btnPlayStop.setOnClickListener(this);
         if (ttsState == State.Ready || ttsState == State.Paused)
@@ -247,7 +298,8 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
         String[] arrBookChapterVerse = Constants.arrVerseCount[currentChapterIdx].split(";");
         currentBook = Integer.parseInt(arrBookChapterVerse[0]);
         currentChapter = Integer.parseInt(arrBookChapterVerse[1]);
-        currentVerseMax = Integer.parseInt(arrBookChapterVerse[2]);
+        initialBook = currentBook;
+        //currentVerseMax = Integer.parseInt(arrBookChapterVerse[2]);
 
         listBooks = Util.createBooksList();
         listChapters = Util.createChaptersList(currentBook);
@@ -264,20 +316,8 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
 //        }
     }
 
-    private void readPreference() {
-        //SpeechRecognizer
-        SharedPreferences preference = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
-        currentChapterIdx = preference.getInt(POSITION_CHAPTER, 0);
-        if (currentChapterIdx < 0 || currentChapterIdx >= arrVerseCount.length) {
-            currentChapterIdx = 0;
-        }
-        currentBibleFilename = preference.getString(POSITION_BIBLE_NAME, "");
-
-        SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        currentBookLanguage = defaultPrefs.getString(BOOK_LANGUAGE, LANG_ENGLISH);
-    }
-
     public void createAdapters () {
+        isFromCode = true;
         ArrayAdapter<String> adapterBooks = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listBooks);
         ArrayAdapter<String> adapterChapters = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listChapters);
         ArrayAdapter<String> adapterVerses = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listVerses);
@@ -291,6 +331,8 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
 //        adapterVoices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spnBook.setAdapter(adapterBooks);
+//        if (currentChapter == listChapters.size()) {
+//        }
         spnChapter.setAdapter(adapterChapters);
         spnVerseStart.setAdapter(adapterVerses);
         spnVerseEnd.setAdapter(adapterVerses);
@@ -299,47 +341,65 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
 
         spnBook.setSelection(currentBook-1);
         spnChapter.setSelection(currentChapter-1);
+        isFromCode = false;
     }
 
 //    public void setLanguage (Locale locale) {
 //        tts.setLanguage(locale);
 //    }
     public void changeBook (int bookNumber) {
+//        if (tts != null)
+//            if (tts.isSpeaking())      {
+//                ttsState = State.Stopped;
+//                tts.stop();
+//        }
+
         listChapters = Util.createChaptersList(bookNumber);
-        listVerses = Util.createVersesList(bookNumber, 1);
+//        listVerses = Util.createVersesList(bookNumber, 1);
         ArrayAdapter<String> adapterChapters = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listChapters);
-        ArrayAdapter<String> adapterVerses = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listVerses);
+//        ArrayAdapter<String> adapterVerses = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listVerses);
 
         adapterChapters.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapterVerses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //isFromCode = true;
+//        adapterVerses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        isFromCode = false;
 
         spnChapter.setAdapter(adapterChapters);
-        spnVerseStart.setAdapter(adapterVerses);
-        spnVerseEnd.setAdapter(adapterVerses);
+//        spnVerseStart.setAdapter(adapterVerses);
+//        spnVerseEnd.setAdapter(adapterVerses);
 
         currentBook = bookNumber;
-        currentChapter = 1;
-        currentVerseMax = listVerses.size();
+        if (currentBook != initialBook) {
+            initialBook = currentBook;
+            currentChapter = 1;
+        }
+        spnChapter.setSelection(currentChapter-1);
+//        currentVerseMax = listVerses.size();
 
-        currentChapterIdx = Util.getChapterIdx(currentBook, currentChapter);
-
-        populateVerseList(currentBibleFilename, currentChapterIdx);
+//        currentChapterIdx = Util.getChapterIdx(currentBook, currentChapter);
+//
+//        populateVerseList(currentBibleFilename, currentChapterIdx);
     }
 
     public void changeChapter (int bookNumber, int chapter) {
+//        if (tts != null)
+//            if (tts.isSpeaking()) {
+//                tts.stop();
+//                ttsState = State.Stopped;
+//            }
+
         listVerses = Util.createVersesList(bookNumber, chapter);
         ArrayAdapter<String> adapterVerses = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listVerses);
 
         adapterVerses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-       // isFromCode = true;
+        isFromCode = false;
 
         spnVerseStart.setAdapter(adapterVerses);
         spnVerseEnd.setAdapter(adapterVerses);
 
         currentBook = bookNumber;
-        currentChapter = chapter;
-        currentVerseMax = listVerses.size();
+        if (chapter == 1 && currentBook != initialBook)
+            currentChapter = chapter;
+//        currentVerseMax = listVerses.size();
 
         currentChapterIdx = Util.getChapterIdx(currentBook, currentChapter);
         populateVerseList(currentBibleFilename, currentChapterIdx);
@@ -355,14 +415,18 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
             changeBook(position+1);
         else if (parent.getId() == R.id.spn_chapter)
             changeChapter(currentBook, position+1);
-        else {
+        else if (ttsState != State.Playing){
             if (Integer.parseInt(spnVerseStart.getSelectedItem().toString()) > Integer.parseInt(spnVerseEnd.getSelectedItem().toString()))
             {
                 spnVerseStart.setSelection(spnVerseStart.getSelectedItemPosition());
                 spnVerseEnd.setSelection(spnVerseStart.getSelectedItemPosition());
             }
+
             currentVerseStart = spnVerseStart.getSelectedItemPosition() + 1;
-            currentVerseEnd = spnVerseEnd.getSelectedItemPosition() + 1;
+            if (switcAutoPlaey.isChecked())
+                currentVerseEnd = currentVerseMax;
+            else
+                currentVerseEnd = spnVerseEnd.getSelectedItemPosition() + 1;
         }
     }
 
@@ -396,22 +460,26 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
     @Override
     public void onClick(View view) {
         if (view == btnPlayStop && btnPlayStop.getText().equals("PLAY")) {
+            currentVerse = currentVerseStart;
             speak();
         }
         else if (view == btnPlayStop && btnPlayStop.getText().equals("STOP")) {
+            ttsState = State.Stopped;
             if (tts.isSpeaking())
                 tts.stop();
             ttsState = State.Stopped;
             txtStatus.setText("Stopped");
             btnPlayStop.setText("PLAY");
+            spnVerseStart.setSelection(currentVerse-1);
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (tts.isSpeaking())
-            tts.stop();
+        if (tts != null)
+            if (tts.isSpeaking())
+                tts.stop();
         tts = null;
     }
 
@@ -429,37 +497,37 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
                     .append(" to ").append(currentVerseEnd);
         String intro = sbintro.toString();
 
-        ttsState = State.Playing;
-        txtStatus.setText("Playing...");
-        btnPlayStop.setText("STOP");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Log.v(TAG, "Speak new API");
-            Bundle bundle = new Bundle();
-            bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-            bundle.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, FINISHED_UTTERANCE_ID);
-            tts.speak(intro, TextToSpeech.QUEUE_ADD, bundle, null);
-            tts.playSilentUtterance(750, TextToSpeech.QUEUE_ADD, null);
-            if (currentVerseStart == currentVerseEnd)
-                tts.speak(Util.parseVerse(verseList.get(currentVerseStart).getVerse()), TextToSpeech.QUEUE_ADD, bundle, null);
-            else
-                for (int i = currentVerseStart-1; i < currentVerseEnd-1; i++) {
-                    tts.playSilentUtterance(50, TextToSpeech.QUEUE_ADD, null);
-                    tts.speak(Util.parseVerse(verseList.get(i).getVerse()), TextToSpeech.QUEUE_ADD, bundle, null);
-                }
-           // isFinished = true;
-        } else {
+//        ttsState = State.Playing;
+//        txtStatus.setText("Playing...");
+//        btnPlayStop.setText("STOP");
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            Log.v(TAG, "Speak new API");
+//            Bundle bundle = new Bundle();
+//            bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
+//            bundle.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, FINISHED_UTTERANCE_ID);
+//            if (currentVerseStart == currentVerse) {
+//                tts.speak(intro, TextToSpeech.QUEUE_ADD, null, null);
+//                tts.playSilentUtterance(750, TextToSpeech.QUEUE_ADD, null);
+//                tts.speak(Util.parseVerse(verseList.get(currentVerse-1).getVerse()), TextToSpeech.QUEUE_ADD, bundle, null);
+//            }
+//            else{
+//                tts.playSilentUtterance(50, TextToSpeech.QUEUE_ADD, null);
+//                tts.speak(Util.parseVerse(verseList.get(currentVerse-1).getVerse()), TextToSpeech.QUEUE_ADD, bundle, null);
+//                }
+//           // isFinished = true;
+//        } else {
             Log.v(TAG, "Speak old API");
             HashMap<String, String> param = new HashMap<>();
             param.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_MUSIC));
             param.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, FINISHED_UTTERANCE_ID);
-            tts.speak(intro, TextToSpeech.QUEUE_ADD, param);
-            tts.playSilence(750, TextToSpeech.QUEUE_ADD, param);
-            if (currentVerseStart == currentVerseEnd)
-                tts.speak(Util.parseVerse(verseList.get(currentVerseStart-1).getVerse()), TextToSpeech.QUEUE_ADD, param);
-            else
-                for (int i = currentVerseStart-1; i < currentVerseEnd-1; i++) {
-                    tts.playSilence(50, TextToSpeech.QUEUE_ADD, param);
-                    tts.speak(Util.parseVerse(verseList.get(i).getVerse()), TextToSpeech.QUEUE_ADD, param);
+            if (currentVerseStart == currentVerse) {
+                tts.speak(intro, TextToSpeech.QUEUE_ADD, null);
+                tts.playSilence(750, TextToSpeech.QUEUE_ADD, null);
+                tts.speak(Util.parseVerse(verseList.get(currentVerse-1).getVerse()), TextToSpeech.QUEUE_ADD, param);
+            }
+            else{
+                tts.playSilence(50, TextToSpeech.QUEUE_ADD, null);
+                tts.speak(Util.parseVerse(verseList.get(currentVerse-1).getVerse()), TextToSpeech.QUEUE_ADD, param);
 //                    lock.lock();
 //                    try {
 //                        done.await();
@@ -471,7 +539,7 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
 //                    }
                 }
             //isFinished = true;
-        }
+//        }
     }
 
     public void populateVerseList (String bibleFilename, int chapterIndex) {
@@ -540,9 +608,9 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
 
                 boolean bookmarked = false;
                 if (prevBreakParagraph) {
-                    verseList.add(new DisplayVerse(i, line, bookmarked, true));
+                    verseList.add(new DisplayVerse(i, line, bookmarked, 0, true));
                 } else {
-                    verseList.add(new DisplayVerse(i, line, bookmarked, false));
+                    verseList.add(new DisplayVerse(i, line, bookmarked,0, false));
                 }
                 prevBreakParagraph = breakParagraph;
                 verseNotAvailable = false;
@@ -567,7 +635,13 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
                 }
             }
         }
+        SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
+        editor.putInt(Constants.CHAPTER_INDEX, currentChapterIdx);
+        editor.apply();
         currentVerseMax = verseList.size();
+        currentVerseEnd = currentVerseMax;
+        currentVerseStart = 1;
+        currentVerse = 1;
     }
 
 }

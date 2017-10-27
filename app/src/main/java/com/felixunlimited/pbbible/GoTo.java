@@ -44,7 +44,7 @@ public class GoTo extends Activity implements OnEditorActionListener, OnClickLis
 	private void readPreference() {
 		SharedPreferences preference = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE);
 		currentBookLanguage = preference.getString(Constants.BOOK_LANGUAGE, Constants.LANG_ENGLISH);
-		currentChapterIdx = preference.getInt(Constants.POSITION_CHAPTER, 0);
+		currentChapterIdx = preference.getInt(Constants.CHAPTER_INDEX, 0);
 	}
 	
 	@Override
@@ -146,7 +146,7 @@ public class GoTo extends Activity implements OnEditorActionListener, OnClickLis
 			}
 			
 			Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
-			editor.putInt(Constants.POSITION_CHAPTER, currentChapterIdx);
+			editor.putInt(Constants.CHAPTER_INDEX, currentChapterIdx);
 			editor.commit();
 			finish();
 	        return true;

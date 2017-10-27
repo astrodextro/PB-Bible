@@ -5,20 +5,22 @@ public class DisplayVerse {
 	private int verseNumber;
 	private String verse;
 	private boolean bookmark;
-	private boolean highlight;
+	private int highlight;
 	private int highlightColor;
 	private boolean insertLineBreak;
 	
-	public DisplayVerse(int verseNumber, String verse, boolean bookmark, boolean insertLineBreak) {
+	public DisplayVerse(int verseNumber, String verse, boolean bookmark, int highlighC, boolean insertLineBreak) {
 		this.verseNumber = verseNumber;
 		this.verse = verse;
+		this.highlight = highlighC;
 		this.bookmark = bookmark;
 		this.insertLineBreak = insertLineBreak;
 	}
 	
-	public DisplayVerse(int verseNumber, String verse, boolean bookmark, boolean insertLineBreak, int chapterIndex) {
+	public DisplayVerse(int verseNumber, String verse, boolean bookmark, int highlight, boolean insertLineBreak, int chapterIndex) {
 		this.verseNumber = verseNumber;
 		this.verse = verse;
+		this.highlight = highlight;
 		this.bookmark = bookmark;
 		this.insertLineBreak = insertLineBreak;
 		this.chapterIndex = chapterIndex;
@@ -42,6 +44,8 @@ public class DisplayVerse {
 	public void setBookmark(boolean bookmark) {
 		this.bookmark = bookmark;
 	}
+	public int getHighlight() { return highlight;};
+	public void setHighlight(int highlight) {this.highlight = highlight;}
 	public boolean isInsertLineBreak() {
 		return insertLineBreak;
 	}

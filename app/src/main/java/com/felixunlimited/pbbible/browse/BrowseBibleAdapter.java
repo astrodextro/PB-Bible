@@ -3,7 +3,6 @@ package com.felixunlimited.pbbible.browse;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,22 +51,22 @@ class BrowseBibleAdapter extends BaseAdapter {
             button = new Button(mContext);
             if (mFrom.equals("book")) {
                 button.setLayoutParams(new GridView.LayoutParams(ViewPager.LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
-                if (position+1 == sharedPreferences.getInt(Constants.POSITION_BOOK, 1))
-                    button.setBackgroundColor(Color.BLUE);
+//                if ((position+1) == BrowseBible.bookNo)
+//                    button.setBackgroundColor(Color.BLUE);
             }
             else {
                 button.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                if (mFrom.equals("chapter") && position+1 == sharedPreferences.getInt(Constants.POSITION_CHAPTER, 1))
-                    button.setBackgroundColor(Color.BLUE);
-                if (mFrom.equals("verse") && position+1 == sharedPreferences.getInt(Constants.POSITION_VERSE, 1))
-                    button.setBackgroundColor(Color.BLUE);
+//                if (mFrom.equals("chapter") && (position+1) == BrowseBible.chapterNo)
+//                    button.setBackgroundColor(Color.BLUE);
+//                if (mFrom.equals("verse") && (position+1) == BrowseBible.verseNo)
+//                    button.setBackgroundColor(Color.BLUE);
             }
             button.setMaxLines(1);
         } else {
             button = (Button) convertView;
         }
 
-//        if (mContext.getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getInt(Constants.POSITION_CHAPTER, 1)==position+1)
+//        if (mContext.getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getInt(Constants.CHAPTER_INDEX, 1)==position+1)
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 //                button.setBackground(Color.RED);
 //            }
@@ -84,9 +83,9 @@ class BrowseBibleAdapter extends BaseAdapter {
                 ViewPager viewPager = BrowseBible.viewPager;
                 switch (mFrom) {
                     case "book":
-                        BrowseBible.bookIdx = position+1;
-                        BrowseBible.chapterIdx = 1;
-                        BrowseBible.verseIdx = 1;
+                        BrowseBible.bookNo = position+1;
+                        BrowseBible.chapterNo = 1;
+                        BrowseBible.verseNo = 1;
                         editor.putInt(Constants.POSITION_BOOK, position+1);
                         editor.putInt(Constants.POSITION_CHAPTER, 1);
                         editor.putInt(Constants.POSITION_VERSE, 1);
@@ -95,12 +94,12 @@ class BrowseBibleAdapter extends BaseAdapter {
                     case "chapter":
                         editor.putInt(Constants.POSITION_CHAPTER, position+1);
                         editor.putInt(Constants.POSITION_VERSE, 1);
-                        BrowseBible.chapterIdx = position+1;
-                        BrowseBible.verseIdx = 1;
+                        BrowseBible.chapterNo = position+1;
+                        BrowseBible.verseNo = 1;
                         viewPager.setCurrentItem(2, true);
                         break;
                     default:
-                        BrowseBible.verseIdx = position+1;
+                        BrowseBible.verseNo = position+1;
                         int currentChapterIdx = 0;
                         int currentVerseIdx = 0;
                         if (goBook > 0 || goChapter > 0) {
@@ -118,7 +117,7 @@ class BrowseBibleAdapter extends BaseAdapter {
                             }
                         }
 
-                        editor.putInt(Constants.POSITION_CHAPTER, currentChapterIdx);
+                        editor.putInt(Constants.CHAPTER_INDEX, currentChapterIdx);
                         editor.putInt(Constants.POSITION_VERSE, currentVerseIdx);
                         editor.apply();
                         Intent showBibleActivity = new Intent(mContext, BiblesOffline.class);

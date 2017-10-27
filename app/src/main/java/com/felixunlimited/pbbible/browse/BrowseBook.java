@@ -1,5 +1,6 @@
 package com.felixunlimited.pbbible.browse;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import com.felixunlimited.pbbible.Constants;
 import com.felixunlimited.pbbible.R;
 import com.felixunlimited.pbbible.Util;
 
@@ -29,6 +31,7 @@ public class BrowseBook extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BrowseBible.bookNo = getContext().getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE).getInt(Constants.POSITION_BOOK, 1);
     }
 
     @Override

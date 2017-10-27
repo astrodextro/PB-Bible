@@ -6,12 +6,12 @@ deuteronomy
 joshua
 judges
 ruth
-first samuel
-second samuel
-first kings
-second kings
-first chronicles
-second chronicles
+first-samuel
+second-samuel
+first-kings
+second-kings
+first-chronicles
+second-chronicles
 ezra
 nehemiah
 esther
@@ -19,7 +19,7 @@ job
 sam
 proverbs
 ecclesiastes
-songs of solomon
+songs-of-solomon
 isaiah
 jeremiah
 lamentations
@@ -43,24 +43,24 @@ luke
 john
 acts
 romans
-first corinthians
-second corinthians
+first-corinthians
+second-corinthians
 galatians
 ephesians
 philippians
 colossians
-first thessalonians
-second thessalonians
-first timothy
-second timothy
+first-thessalonians
+second-thessalonians
+first-timothy
+second-timothy
 titus
 philemon
 hebrews
 james
-first peter
-second peter
-first john
-second john
-third john
+first-peter
+second-peter
+first-john
+second-john
+third-john
 jude
 revelation

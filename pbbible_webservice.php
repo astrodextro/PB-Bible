@@ -8,25 +8,30 @@
 	if ($_SERVER["REQUEST_METHOD"] == "POST")
 	{
 
-		// validate submission
-		
 		if ($_POST["table"] == "sync")
 		{
-			$queries[] = json_decode(urldecode($_POST["query"]), true);
+		  $queries[] = json_decode(urldecode($_POST["query"]), true);
 		  $n = 0;
+		  $bae_scriptures = [];
 		  //if ()
 		  foreach ($queries[0] as $query)
 		  {
+			  $resp = "error inserting";
 			  // Insert into / update specific user
-				if(query("INSERT INTO ".str_replace("@", "_", $query["user_email"])."(scripture, category, timestamp) VALUES (?,?,?) ON DUPLICATE KEY UPDATE timestamp = ?", $query["scripture"], $query["category"], $query["timestamp"], $query["timestamp"]) !== false)
+				if(query("INSERT INTO ".str_replace(".","_",str_replace("@", "_", $query["user_email"]))."(scripture, category, timestamp) VALUES (?,?,?) ON DUPLICATE KEY UPDATE timestamp = ?", $query["scripture"], $query["category"], $query["timestamp"], $query["timestamp"]) !== false)
 				{
 					$n++;
 				}
 			}
-
-		    if ($n > 0)
-				echo json_encode(["response" => "ok"]);
-		   
+			if ($n > 0)
+				$resp = "inserted";
+			if (($bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $queries[0][0]["user_email"]) !== false))
+				if (($bae_scriptures = query("SELECT * FROM ".str_replace(".","_",str_replace("@", "_", $bae[0]["user_email"])))) !== false) {
+					echo json_encode(["response" => $resp, "scriptures" => $bae_scriptures, "bae" => $bae]);
+					exit;
+				}
+//C:\Felix I-O\VoiceRecognition\sphinxbase\bin\Debug\x64>sphinx_fe -argfile en-us/feat.params \ -samprate 16000 -c arctic20.fileids \ -di . -do . -ei wav -eo mfc -mswav yes
+			echo json_encode(["response" => "error"]);
 			exit;
 		}
 
@@ -35,53 +40,62 @@
 			echo json_encode(["response" => "ok"]);
 		    exit;
 		}
+		if ($_POST["table"] == "bae_cancel")
+		{
+			$queries[] = json_decode(urldecode($_POST["query"]), true);
+			$n = 0;
+			$query = $queries[0];
+			$bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"]);
+			if ($bae["bae_confirm"] == 1) {
+				echo json_encode(["response" => "confirmed", "bae" => $bae]);
+				exit;
+			}
+			else if (query("INSERT INTO pb_bible_users(bae_request, bae_receipt, bae_confirm, bae_email) VALUES(0,0,0,'') WHERE user_email = ?", $query["user_email"]) !== false)
+				if (query("INSERT INTO pb_bible_users(bae_request, bae_receipt, bae_confirm, bae_email) VALUES(0,0,0,'') WHERE user_email = ?", $query["bae_email"]) !== false)
+				{
+					echo json_encode(["response" => "deleted", "bae" => query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"])]);
+					exit;
+				}
+
+			echo json_encode(["response" => "error"]);
+			exit;
+		}
 		if ($_POST["table"] == "bae_request")
 		{
 			$queries[] = json_decode(urldecode($_POST["query"]), true);
 			$n = 0;
 			$query = $queries[0];
-			$responses = query("SELECT * FROM".str_replace("@", "_", $query["user_email"]));
+			$bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"]);
 
-			if ($response !== false)
-			{
-				if ($response["bae_request"] == "confirmed")
+			if ($bae["bae_confirm"] == 1) {
+				echo json_encode(["response" => "confirmed", "bae" => $bae]);
+				exit;
+			}
+			else if (query("INSERT INTO pb_bible_users(bae_email, bae_request) VALUES(?,1) WHERE user_email = ?", $query["bae_email"], $query["user_email"]) !== false)
+				if (query("INSERT INTO pb_bible_users(bae_email, bae_receipt) VALUES(?,1) WHERE user_email = ?", $query["user_email"], $query["bae_email"]) !== false)
 				{
-					echo json_encode(["response" => "confirmed"]);
+					$bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"]);
+					echo json_encode(["response" => "pending", "bae" => $bae]);
 					exit;
 				}
-				else
-				{
-					echo json_encode(["response" => "pending"]);
-					exit;
-				}
-			}
-			else
-			{
-				if (query("INSERT INTO pb_bible_users(bae_email, bae_request) VALUES(?,?) WHERE user_email = ?", $query["bae_email"], $query{"bae_request"}, $query["user_email"]) !== false)
-					if (query("INSERT INTO pb_bible_users(bae_email, bae_receipt) VALUES(?,?) WHERE user_email = ?", $query["user_email"], $query{"bae_request"}, $query["bae_email"]) !== false)
-					{
-						echo json_encode(["response" => "pending"]);
-						exit;
-					}
-			}
-			echo json_encode(["response" => "error inserting"]);
+			echo json_encode(["response" => "error"]);
 			exit;
 		}
+
 		if ($_POST["table"] == "bae_confirm")
 		{
 			$queries[] = json_decode(urldecode($_POST["query"]), true);
 			$n = 0;
 			$query = $queries[0];
-			$responses = query("SELECT * FROM".str_replace("@", "_", $query["user_email"]));
-
-			if (query("INSERT INTO pb_bible_users(bae_request) VALUES(?) WHERE user_email = ?", $query{"bae_request"}, $query["user_email"]) !== false)
-				if (query("INSERT INTO pb_bible_users(bae_email, bae_receipt) VALUES(?,?) WHERE user_email = ?", $query{"bae_request"}, $query["bae_email"]) !== false)
+			
+			if (query("INSERT INTO pb_bible_users(bae_request, bae_receipt, bae_confirm, bae_email) VALUES(0,0,1,?) WHERE user_email = ?", $query{"bae_email"}, $query["user_email"]) !== false)
+				if (query("INSERT INTO pb_bible_users(bae_request, bae_receipt, bae_confirm, bae_email) VALUES(0,0,1,?) WHERE user_email = ?", $query{"user_email"}, $query["bae_email"]) !== false)
 				{
-					echo json_encode(["response" => "confirmed"]);
+					echo json_encode(["response" => "confirmed", "bae" => query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"])]);
 					exit;
 				}
 
-			echo json_encode(["response" => "error inserting"]);
+			echo json_encode(["response" => "error"]);
 			exit;
 		}
 
@@ -90,7 +104,7 @@
 			$queries[] = json_decode(urldecode($_POST["query"]), true);
 			$query = $queries[0];
 			$n = 0;
-			if (query ("CREATE TABLE IF NOT EXISTS ". str_replace("@", "_", $query["user_email"]) ." (id int(10) primary key autoincrement, scripture varchar(255), category varchar(255), timestamp varchar(255))") !== false)
+			if (query ("CREATE TABLE IF NOT EXISTS ". str_replace(".","_",str_replace("@", "_", $query["user_email"])) ." (id int(10) primary key auto_increment, scripture varchar(255), category varchar(255), timestamp varchar(255))") !== false)
 			{
 				if (query("INSERT INTO pb_bible_users(user_id, user_email) VALUES(?,?)", $query["user_id"], $query{"user_email"}) !== false)
 				{
@@ -100,8 +114,8 @@
 			}
 			else
 			{
-			echo json_encode(["response" => "user already exists", "bae"=> query("SELECT * FROM".str_replace("@", "_", $query["user_email"]))]);		   
-			exit;
+				echo json_encode(["response" => "user already exists", "bae"=> query("SELECT * FROM".str_replace(".","_",str_replace("@", "_", $query["user_email"])))]);		   
+				exit;
 			}
 		}
 		
@@ -124,20 +138,19 @@
 		}
 		if ($_POST["table"] == "get")
 		{
-		    $query = $_POST["query"];
-			if (query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query) !== false)
+		    $query = urldecode($_POST["query"]);
+			if (($user = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query)) !== false)
 			{
 			//$bookmarks = query("SELECT * FROM ".$query["user_email"]."WHERE category = 'bookmarks'");
 			// $bae_sent = query("SELECT * FROM ".$query["user_email"]."WHERE category = 'bae_sent'");
 			// $bae_received = query("SELECT * FROM ".$query["user_email"]."WHERE category = 'bae_received'");
 			// echo json_encode(["user" => $user, "bae_sent" => $bae_sent, "bae_received" => $bae_received], JSON_PARTIAL_OUTPUT_ON_ERROR);
-			$user = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query);
-				$scriptures = query("SELECT * FROM ".str_replace("@", "_", $query));
-				echo json_encode(["user" => $user, "scriptures" => $scriptures], JSON_PARTIAL_OUTPUT_ON_ERROR);
+				if (($scriptures = query("SELECT * FROM ".str_replace(".","_",str_replace("@", "_", $query)))) !== false)
+					echo json_encode(["response" => "ok", "user" => $user, "scriptures" => $scriptures], JSON_PARTIAL_OUTPUT_ON_ERROR);
 				exit();
 			}
 			else{
-				echo json_encode(["response" => "ok"]);
+				echo json_encode(["response" => "error"]);
 				exit();
 			}
 		}

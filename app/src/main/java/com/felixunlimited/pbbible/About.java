@@ -193,8 +193,8 @@ public class About extends Activity {
 //				int book = getIntent().getExtras().getInt(Constants.WIDGET_BOOK, 1);
 //				int chapter = getIntent().getExtras().getInt(Constants.WIDGET_CHAPTER, 1);
 //				SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
-//				int chapterIdx = Constants.arrBookStart[book-1] + chapter-1;
-//				editor.putInt(Constants.POSITION_CHAPTER, chapterIdx);
+//				int chapterNo = Constants.arrBookStart[book-1] + chapter-1;
+//				editor.putInt(Constants.CHAPTER_INDEX, chapterNo);
 //				editor.putString(Constants.POSITION_BIBLE_NAME, bible + ".ont");
 //				editor.commit();
 //			}
@@ -409,7 +409,7 @@ public class About extends Activity {
 //
 //	private void readPreference() {
 //		SharedPreferences preference = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE);
-//		currentChapterIdx = preference.getInt(Constants.POSITION_CHAPTER, 0);
+//		currentChapterIdx = preference.getInt(Constants.CHAPTER_INDEX, 0);
 //		if (currentChapterIdx < 0 || currentChapterIdx >= Constants.arrVerseCount.length) {
 //			currentChapterIdx = 0;
 //		}
@@ -1183,7 +1183,7 @@ public class About extends Activity {
 //		super.onPause();
 //		// Save the current position
 //		SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
-//		editor.putInt(Constants.POSITION_CHAPTER, currentChapterIdx);
+//		editor.putInt(Constants.CHAPTER_INDEX, currentChapterIdx);
 //		editor.putString(Constants.POSITION_BIBLE_NAME, currentBibleFilename);
 //		editor.putString(Constants.POSITION_BIBLE_NAME_2, currentBibleFilename2);
 //		editor.putString(Constants.BOOK_LANGUAGE, currentBookLanguage);
@@ -1232,7 +1232,7 @@ public class About extends Activity {
 //		} else if (gotoBrowse) {
 //			gotoBrowse = false;
 //			SharedPreferences preference = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE);
-//			currentChapterIdx = preference.getInt(Constants.POSITION_CHAPTER, 0);
+//			currentChapterIdx = preference.getInt(Constants.CHAPTER_INDEX, 0);
 //			if (lastChapterIdx != currentChapterIdx) {
 //				displayBible(currentBibleFilename, currentChapterIdx);
 //			}

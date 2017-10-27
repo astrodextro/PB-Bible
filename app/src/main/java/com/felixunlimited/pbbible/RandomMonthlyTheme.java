@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
@@ -25,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -88,7 +90,7 @@ public class RandomMonthlyTheme extends Service {
             theme = sharedPreferences.getString(MONTHLY_THEME, "Taking Over");
             createTimerTask();
             paused = false;
-            timer.schedule(doAsynchronousTask, 3600000, 3600000);
+            timer.schedule(doAsynchronousTask, 1800000, 3600000);
         }
     }
 
@@ -119,9 +121,9 @@ public class RandomMonthlyTheme extends Service {
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, theme);
         shareIntent.putExtra(Intent.EXTRA_TEXT, "Theme for "+month);
-        Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ DOWNLOAD_FOLDER+"/theme.png"));
+        Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ DOWNLOAD_FOLDER+"/theme.jpg"));
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);  //optional//use this when you want to send an image
-        shareIntent.setType("image/png");
+        shareIntent.setType("image/jpg");
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         Intent chooserIntent = Intent.createChooser(shareIntent, "Share theme for "+month);
         chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -181,7 +183,7 @@ public class RandomMonthlyTheme extends Service {
     public void displayNotification() {
         Intent resultIntent = new Intent(this, BiblesOffline.class);
         resultIntent.putExtra(FROM_WIDGET, true);
-        resultIntent.putExtra(WIDGET_BOOK,  scripture.split(" ", 2)[0]);
+        resultIntent.putExtra(WIDGET_BOOK, Arrays.asList(Constants.arrBookName).indexOf(scripture.split(" ", 2)[0])+1);
         int[] chapterAndVerse = Util.getChapterAndVerse(scripture.split(" ", 2)[1]);
         resultIntent.putExtra(WIDGET_CHAPTER, chapterAndVerse[0]);
         resultIntent.putExtra(WIDGET_VERSE, chapterAndVerse[1]);
@@ -193,25 +195,30 @@ public class RandomMonthlyTheme extends Service {
         PendingIntent sharePendingIntent = PendingIntent.getActivity(this, 0, shareTheme(), PendingIntent.FLAG_UPDATE_CURRENT);
 
         RemoteViews expandedView = new RemoteViews(this.getPackageName(), R.layout.random_monthly_theme);
-        Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath()+Constants.DOWNLOAD_FOLDER+"/theme.png"));
+        Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath()+Constants.DOWNLOAD_FOLDER+"/theme.jpg"));
         expandedView.setImageViewUri(R.id.imageView, uri);
         expandedView.setOnClickPendingIntent(R.id.shareButton, sharePendingIntent);
 //        expandedView.setImageViewBitmap(R.id.imageView, BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getAbsolutePath()+Constants.DOCUMENT_FOLDER+"/theme.png"));
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ DOWNLOAD_FOLDER+"/theme.mp3";
-        Uri.Builder uriBuilder = new Uri.Builder();
-        Uri soundUri = uriBuilder.path(path).build();
+//        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ DOWNLOAD_FOLDER+"/theme.mp3";
+//        Uri.Builder uriBuilder = new Uri.Builder();
+//        Uri soundUri = uriBuilder.path(path).build();
+//        soundFile.setReadable(true, false);
+        File soundFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+Constants.DOWNLOAD_FOLDER+"/theme.mp3");
+        Uri soundUri = Uri.fromFile(soundFile);
 
         Notification notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setAutoCancel(true)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setSound(soundUri)
+//                .setDefaults(~Notification.DEFAULT_SOUND)
+                .setSound(soundUri, AudioManager.STREAM_NOTIFICATION)
+                .setAutoCancel(true)
 //                .addAction(android.R.drawable.ic_menu_share, "Share", sharePendingIntent)
                 .setContentIntent(resultPendingIntent)
                 .setPriority(Notification.PRIORITY_MAX)
                 .setContentTitle("Theme for "+month)
                 .setContentText(theme)
-                .setDefaults(Notification.DEFAULT_SOUND)
+//                .setDefaults(Notification.DEFAULT_SOUND)
                 .build();
         notification.bigContentView = expandedView;
 //        NotificationManager mNotificationManager =

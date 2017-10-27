@@ -1,6 +1,5 @@
 package com.felixunlimited.pbbible;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -8,16 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -40,11 +37,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.felixunlimited.pbbible.browse.BrowseBible;
 import com.felixunlimited.pbbible.notes.NoteListActivity;
 import com.felixunlimited.pbbible.speech.Listen;
-import com.felixunlimited.pbbible.speech.PocketSphinxActivity;
+import com.felixunlimited.pbbible.sync.BaeActivity;
 import com.felixunlimited.pbbible.sync.Sync;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -65,6 +65,7 @@ import static com.felixunlimited.pbbible.Constants.BIBLE_FOLDER;
 import static com.felixunlimited.pbbible.Constants.BOOKMARK_VERSE_START;
 import static com.felixunlimited.pbbible.Constants.BOOKNAME_FOLDER;
 import static com.felixunlimited.pbbible.Constants.BOOK_LANGUAGE;
+import static com.felixunlimited.pbbible.Constants.CHAPTER_INDEX;
 import static com.felixunlimited.pbbible.Constants.CURRENT_BIBLE;
 import static com.felixunlimited.pbbible.Constants.DB_DATE_FORMAT;
 import static com.felixunlimited.pbbible.Constants.FONT_SIZE;
@@ -78,7 +79,6 @@ import static com.felixunlimited.pbbible.Constants.PARALLEL;
 import static com.felixunlimited.pbbible.Constants.POSITION_BIBLE_NAME;
 import static com.felixunlimited.pbbible.Constants.POSITION_BIBLE_NAME_2;
 import static com.felixunlimited.pbbible.Constants.POSITION_BOOK;
-import static com.felixunlimited.pbbible.Constants.POSITION_CHAPTER;
 import static com.felixunlimited.pbbible.Constants.PREFERENCE_NAME;
 import static com.felixunlimited.pbbible.Constants.WIDGET_BIBLE;
 import static com.felixunlimited.pbbible.Constants.WIDGET_BOOK;
@@ -97,9 +97,6 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		OnItemClickListener{
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
     private static final String TAG = "BiblesOffline";
-	private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1123;
-	private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1023;
-	private static final int MY_PERMISSIONS_REQUEST_GET_ACCOUNTS = 1223;
 
 	private DatabaseHelper databaseHelper;
 	private boolean isOpen = false;
@@ -350,18 +347,18 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 
 		DisplayVerse verse = verseList.get(info.position);
 		if (verse == null) return;
+        if (!verse.isBookmark()) {
+            menu.add(Menu.NONE, Menu.FIRST+2, Menu.NONE, R.string.addBookmark);
+        } else {
+            menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.editBookmark);
+            menu.add(Menu.NONE, Menu.FIRST+1, Menu.NONE, R.string.removeBookmark);
+        }
 		menu.add(Menu.NONE, Menu.FIRST+3, Menu.NONE, R.string.copyToClipboard);
 		menu.add(Menu.NONE, Menu.FIRST+4, Menu.NONE, R.string.share);
-		menu.add(Menu.NONE, Menu.FIRST+5, Menu.NONE, R.string.highlight);
-		menu.add(Menu.NONE, Menu.FIRST+6, Menu.NONE, R.string.send_to_bae);
-		menu.add(Menu.NONE, Menu.FIRST+7, Menu.NONE, R.string.send_to_prayer_list);
+		menu.add(Menu.NONE, Menu.FIRST+5, Menu.NONE, R.string.highlight).setVisible(false);
+		menu.add(Menu.NONE, Menu.FIRST+6, Menu.NONE, R.string.send_to_bae).setVisible(false);
+		menu.add(Menu.NONE, Menu.FIRST+7, Menu.NONE, R.string.send_to_note);
 
-		if (verse.isBookmark()) {
-			menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.editBookmark);
-			menu.add(Menu.NONE, Menu.FIRST+1, Menu.NONE, R.string.removeBookmark);
-		} else {
-			menu.add(Menu.NONE, Menu.FIRST+2, Menu.NONE, R.string.addBookmark);
-		}
 	}
 
 	@Override
@@ -457,22 +454,13 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 				return true;
 			case Menu.FIRST+5: //highlight
 				copyOrShare = 'h';
-				arrBookChapter = arrVerseCount[currentChapterIdx].split(";");
-				book = Integer.parseInt(arrBookChapter[0]);
-				chapter = Integer.parseInt(arrBookChapter[1]);
-				bm = databaseHelper.getBookmark(book, chapter, verse.getVerseNumber());
-				bookmarkVerseStart = bm.getVerseStart();
-				bookmarkVerseEnd = bm.getVerseEnd();
+				bookmarkVerseStart = verse.getVerseNumber();
+				bookmarkVerseEnd = verse.getVerseNumber();
 				txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
 				txtVerse.setTextSize(currentFontSize);
-				sb = new StringBuffer();
-				for (int j=bookmarkVerseStart; j<=bookmarkVerseEnd; j++) {
-					DisplayVerse v = verseList.get(index + (j-bookmarkVerseStart));
-					sb.append(Util.parseVerse(v.getVerse())).append(" ");
-				}
-				txtVerse.setText(sb.substring(0, sb.length()-1));
-				refreshBookNameOnCopyToClipboardDialog();
-				copyToClipboardDialog.setTitle("Share verse");
+				txtVerse.setText(Util.parseVerse(verse.getVerse()));
+				refreshBookNameOnBookmarkDialog();
+				copyToClipboardDialog.setTitle("Highlight");
 				copyToClipboardDialog.show();
 				return true;
 			case Menu.FIRST+6 : //send to bae
@@ -483,18 +471,18 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 				txtVerse.setTextSize(currentFontSize);
 				txtVerse.setText(Util.parseVerse(verse.getVerse()));
 				refreshBookNameOnCopyToClipboardDialog();
-				copyToClipboardDialog.setTitle("Share verse");
+				copyToClipboardDialog.setTitle("Send to Bae");
 				copyToClipboardDialog.show();
 				return true;
-			case Menu.FIRST+7 : //send to prayer list
-				copyOrShare = 'p';
+			case Menu.FIRST+7 : //send to note
+				copyOrShare = 'n';
 				bookmarkVerseStart = verse.getVerseNumber();
 				bookmarkVerseEnd = verse.getVerseNumber();
 				txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
 				txtVerse.setTextSize(currentFontSize);
 				txtVerse.setText(Util.parseVerse(verse.getVerse()));
 				refreshBookNameOnCopyToClipboardDialog();
-				copyToClipboardDialog.setTitle("Send to prayer list");
+				copyToClipboardDialog.setTitle("Send to note");
 				copyToClipboardDialog.show();
 				return true;
 		}
@@ -507,7 +495,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		int bookNo = Integer.parseInt(arrBookChapter[0]);
 		SharedPreferences.Editor editor = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE).edit();
 		editor.putInt(POSITION_BOOK, bookNo);
-		editor.putInt(POSITION_CHAPTER, currentChapterIdx);
+		editor.putInt(CHAPTER_INDEX, currentChapterIdx);
 		editor.apply();
 	}
 
@@ -531,14 +519,23 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {	
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			if (!getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getBoolean(Constants.PERMISSION_GRANTED, false)) {
+				Intent showSplashScreen = new Intent(this, SplashScreen.class);
+				showSplashScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				startActivity(showSplashScreen);
+				finish();
+				return;
+			}
+		}
 		Util.setTheme(this, R.style.AppBaseTheme_Light_NoTitleBar);
-		getPermission();
 //        createKWSFile();
-		Util.copyAssetsFilesToSdCard(this);
-		if (Util.isMyServiceRunning(RandomMonthlyTheme.class, this))
-			stopService(new Intent(BiblesOffline.this, RandomMonthlyTheme.class));
+//		if (Util.isMyServiceRunning(RandomMonthlyTheme.class, this))
+//			stopService(new Intent(BiblesOffline.this, RandomMonthlyTheme.class));
+		if (!Util.isMyServiceRunning(RandomMonthlyTheme.class, this))
+			startService(new Intent(this, RandomMonthlyTheme.class));
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		bookmarkVerseStart = 1;
@@ -559,7 +556,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 				int chapter = getIntent().getExtras().getInt(WIDGET_CHAPTER, 1);
 				Editor editor = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE).edit();
 				int chapterIdx = arrBookStart[book-1] + chapter-1;
-				editor.putInt(POSITION_CHAPTER, chapterIdx);
+				editor.putInt(CHAPTER_INDEX, chapterIdx);
 				editor.putString(POSITION_BIBLE_NAME, bible + ".ont");
 				editor.commit();
 			}
@@ -579,7 +576,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		isOpen = true;
 
 		LayoutInflater li = LayoutInflater.from(this);
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder;
 		
 		footnoteView = li.inflate(R.layout.footnote, null);
 		builder = new AlertDialog.Builder(this);
@@ -620,19 +617,35 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		nextButton.setOnClickListener(this);
 		View txtCurrent = findViewById(R.id.txtCurrent);
 		txtCurrent.setOnClickListener(this);
+/*
 		txtCurrent.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View view) {
+				startActivity(new Intent(BiblesOffline.this, PocketSphinxActivity.class));
+				return true;
+			}
+		});
+*/
+		View btnFullscreen = findViewById(R.id.btnFullscreen);
+		btnFullscreen.setOnClickListener(this);
+		View btnMenu = findViewById(R.id.btnMenu);
+		btnMenu.setOnClickListener(this);
+		btnMenu.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View view) {
+				startActivity(new Intent(BiblesOffline.this, PDFViewer.class));
+				return true;
+			}
+		});
+        btnListen = findViewById(R.id.btnListen);
+        btnListen.setOnClickListener(this);
+		btnListen.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View view) {
 				startActivity(new Intent(BiblesOffline.this, Voice.class));
 				return true;
 			}
 		});
-		View btnFullscreen = findViewById(R.id.btnFullscreen);
-		btnFullscreen.setOnClickListener(this);
-		View btnMenu = findViewById(R.id.btnMenu);
-		btnMenu.setOnClickListener(this);
-        btnListen = findViewById(R.id.btnListen);
-        btnListen.setOnClickListener(this);
 		View btnZoomIn = findViewById(R.id.btnZoomIn);
 		btnZoomIn.setOnClickListener(this);
 		View btnZoomOut = findViewById(R.id.btnZoomOut);
@@ -651,6 +664,8 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		dialogBibles.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		readPreference();
+		Util.copyAssetsFilesToSdCard(this);
+
 		LinearLayout bottomBar = (LinearLayout) findViewById(R.id.bottomBar);
 		if (isFullScreen) {
 			bottomBar.setVisibility(View.GONE);
@@ -682,7 +697,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		ad.setView(viewHistory);		
 		dialogHistory = ad.create();
 		dialogHistory.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
+
 		if (!fromBookmarks) {
 			// Show the ProgressDialog on this thread		
 	        this.pd = ProgressDialog.show(this, getResources().getString(R.string.pleaseWait), getResources().getString(R.string.loading), true, false);
@@ -783,7 +798,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 	private void readPreference() {
 		//SpeechRecognizer
 		SharedPreferences preference = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
-		currentChapterIdx = preference.getInt(POSITION_CHAPTER, 0);
+		currentChapterIdx = preference.getInt(CHAPTER_INDEX, 0);
 		if (currentChapterIdx < 0 || currentChapterIdx >= arrVerseCount.length) {
 			currentChapterIdx = 0;
 		}
@@ -827,6 +842,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		if (!isOpen)
 			databaseHelper.open();
 		List<Integer> bookmarkList = databaseHelper.getBookmarkVerseStartByChapterIndex(chapterIndex);
+		List<Integer> highlighedList = databaseHelper.getHighlightVerseStartByChapterIndex(chapterIndex);
 
 		verseList.clear();
 		BufferedReader br = null;
@@ -869,14 +885,17 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 				line = line.replaceAll("\n\n\n\n", "\n\n");
 				
 				boolean bookmarked = false;
+				int highlighted = 0;
+				if (!highlighedList.isEmpty())
+					highlighted = highlighedList.get(i-1);
 				if (bookmarkList.contains(Integer.valueOf(i))) {
 					bookmarked = true;
 				}
 				
 				if (prevBreakParagraph) {
-					verseList.add(new DisplayVerse(i, line, bookmarked, true));
+					verseList.add(new DisplayVerse(i, line, bookmarked, highlighted, true));
 				} else {
-					verseList.add(new DisplayVerse(i, line, bookmarked, false));
+					verseList.add(new DisplayVerse(i, line, bookmarked, highlighted, false));
 				}
 				prevBreakParagraph = breakParagraph;
 				verseNotAvailable = false;
@@ -986,11 +1005,12 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 					line = line.replaceAll("\n\n\n\n", "\n\n");
 					
 					boolean bookmarked = false;
+					int highlight = 0;
 					
 					if (prevBreakParagraph) {
-						verseParallelList.add(new DisplayVerse(i, line, bookmarked, true));
+						verseParallelList.add(new DisplayVerse(i, line, bookmarked, highlight, true));
 					} else {
-						verseParallelList.add(new DisplayVerse(i, line, bookmarked, false));
+						verseParallelList.add(new DisplayVerse(i, line, bookmarked, highlight, false));
 					}
 					prevBreakParagraph = breakParagraph;
 					verseNotAvailable = false;
@@ -1377,7 +1397,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 			}
 			gotoBrowse = true;
 			lastChapterIdx = currentChapterIdx;
-			startActivity(new Intent(this, BrowseBible.class));
+			startActivity(new Intent(this, GoTo.class));
 			break;
         case R.id.btnFullscreen:
             LinearLayout bottomBar = (LinearLayout) findViewById(R.id.bottomBar);
@@ -1467,18 +1487,18 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 			refreshBookNameOnCopyToClipboardDialog();
 			break;
 		case R.id.txtBibleName:
-			startActivity(new Intent(this, PocketSphinxActivity.class));
+			//startActivity(new Intent(this, BaeActivity.class));
 //			if (!Util.isMyServiceRunning(RandomMonthlyTheme.class, this))
 //				startService(new Intent(this, GeneralSpeechRecognizerService.class));
 //			else
 //				stopService(new Intent(this, GeneralSpeechRecognizerService.class));
 
-//			if (!isParallel) {
-//				dialogBibles.show();
-//			} else {
-//				gotoSelectParallel = true;
-//				startActivity(new Intent(this, SelectParallelBible.class));
-//			}
+			if (!isParallel) {
+				dialogBibles.show();
+			} else {
+				gotoSelectParallel = true;
+				startActivity(new Intent(this, SelectParallelBible.class));
+			}
 			break;
 		}
 	}
@@ -1486,7 +1506,8 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 	@Override
 	protected void onDestroy() {
 		//close database
-		databaseHelper.close();
+		if (isOpen)
+			databaseHelper.close();
 		isOpen = false;
 		if (!Util.isMyServiceRunning(RandomMonthlyTheme.class, this))
 			startService(new Intent(this, RandomMonthlyTheme.class));
@@ -1509,7 +1530,8 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 				bm.setBook(book);
 				bm.setChapter(chapter);
 				bm.setVerseStart(bookmarkVerseStart);
-				bm.setVerseEnd(bookmarkVerseEnd);
+//				bm.setVerseEnd(bookmarkVerseEnd);
+				bm.setHighlighted(0);
 				bm.setContent(txtVerse.getText().toString());
 				bm.setBible(currentBibleFilename.substring(0, currentBibleFilename.length()-4));
 				bm.setBookmarkDate(isoFormat.format(new Date()));
@@ -1533,15 +1555,47 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 					i.putExtra(Intent.EXTRA_TEXT, txtBook.getText() + " " + txtVerse.getText());
 					startActivity(Intent.createChooser(i, "Share"));
 				} else if (copyOrShare == 'b') {
-					Intent i=new Intent(android.content.Intent.ACTION_SEND);
-					i.setType("text/plain");
-					i.putExtra(Intent.EXTRA_SUBJECT, txtBook.getText());
-					i.putExtra(Intent.EXTRA_TEXT, txtBook.getText() + " " + txtVerse.getText());
-					startActivity(Intent.createChooser(i, "Share"));
-				} else if (copyOrShare == 'p') {
+					JSONObject jsonObject = new JSONObject();
+					JSONArray jsonArray = new JSONArray();
+					try {
+						jsonObject.put("scripture", txtBook.getText());
+						jsonObject.put("timestamp", System.currentTimeMillis());
+						jsonObject.put("category", "bae_sent");
+						jsonArray.put(jsonObject);
+						databaseHelper.insertScriptures(jsonArray.toString());
+						SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
+						editor.putBoolean(Constants.SCRIPTURES_SYNC, false);
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					Toast.makeText(this, "sent to BAE", Toast.LENGTH_SHORT).show();
+					startActivity(new Intent(this, BaeActivity.class));
+				} else if (copyOrShare == 'n') {
 					Intent i=new Intent(this, NoteListActivity.class);
 					i.putExtra(com.felixunlimited.pbbible.notes.Util.ARG_SCRIPTURE, txtBook.getText() + " " + txtVerse.getText());
 					startActivity(i);
+				}
+				else if (copyOrShare == 'h') {
+					SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
+					SimpleDateFormat isoFormat = new SimpleDateFormat(DB_DATE_FORMAT);
+					String[] arrBookChapter = arrVerseCount[currentChapterIdx].split(";");
+					int book = Integer.parseInt(arrBookChapter[0]);
+					int chapter = Integer.parseInt(arrBookChapter[1]);
+					Bookmark bm = new Bookmark();
+					bm.setBook(book);
+					bm.setChapter(chapter);
+					bm.setHighlighted(1);
+					bm.setVerseStart(bookmarkVerseStart);
+					bm.setVerseEnd(bookmarkVerseEnd);
+					bm.setContent(txtVerse.getText().toString());
+					bm.setBible(currentBibleFilename.substring(0, currentBibleFilename.length()-4));
+					bm.setBookmarkDate(isoFormat.format(new Date()));
+					databaseHelper.insertReplaceBookmark(bm);
+					for (int i = bookmarkVerseStart; i <= bookmarkVerseEnd; i++){
+						editor.putInt(currentChapterIdx+""+i, 1);
+					}
+					editor.commit();
+					displayBible(currentBibleFilename, currentChapterIdx, false);
 				}
 			}
 		}
@@ -1572,7 +1626,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		super.onPause();
 		// Save the current position
 		Editor editor = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE).edit();
-		editor.putInt(POSITION_CHAPTER, currentChapterIdx);
+		editor.putInt(CHAPTER_INDEX, currentChapterIdx);
 		editor.putString(POSITION_BIBLE_NAME, currentBibleFilename);
 		editor.putString(POSITION_BIBLE_NAME_2, currentBibleFilename2);
 		editor.putString(BOOK_LANGUAGE, currentBookLanguage);
@@ -1621,7 +1675,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		} else if (gotoBrowse) {
 			gotoBrowse = false;
 			SharedPreferences preference = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
-			currentChapterIdx = preference.getInt(POSITION_CHAPTER, 0);
+			currentChapterIdx = preference.getInt(CHAPTER_INDEX, 0);
 			if (lastChapterIdx != currentChapterIdx) {
 				displayBible(currentBibleFilename, currentChapterIdx);
 			}
@@ -1739,7 +1793,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 				return true;
 			case R.id.about:
 				AlertDialog.Builder ad = new AlertDialog.Builder(this);
-				String[] arrImport = new String[] {"About " + currentBibleName, "About Open Bibles"};
+				String[] arrImport = new String[] {"About " + currentBibleName, "About PB-Bible"};
 				ListView viewChooseAbout = new ListView(this);
 				ad.setView(viewChooseAbout);		
 				final AlertDialog dialogChooseAbout = ad.create();
@@ -1785,6 +1839,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 			case R.id.settings:
 				gotoPrefs = true;
 				startActivity(new Intent(this, Prefs.class));
+				finish();
 				return true;
 			case R.id.downloadBookname:
 				gotoPrefs = true;
@@ -1887,104 +1942,6 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 	  if (isParallel) {
 		  applyParallel(isParallel);
 	  }
-	}
-
-	public void getPermission () {
-		// Here, thisActivity is the current activity
-		if (ContextCompat.checkSelfPermission(this,
-				Manifest.permission.WRITE_EXTERNAL_STORAGE)
-				!= PackageManager.PERMISSION_GRANTED) {
-
-			// Should we show an explanation?
-			if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-					Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
-				// Show an explanation to the user *asynchronously* -- don't block
-				// this thread waiting for the user's response! After the user
-				// sees the explanation, try again to request the permission.
-
-			} else {
-
-				// No explanation needed, we can request the permission.
-
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-
-				// MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE is an
-				// app-defined int constant. The callback method gets the
-				// result of the request.
-			}
-		}
-		if (ContextCompat.checkSelfPermission(this,
-				Manifest.permission.RECORD_AUDIO)
-				!= PackageManager.PERMISSION_GRANTED) {
-
-			// Should we show an explanation?
-			if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-					Manifest.permission.RECORD_AUDIO)) {
-
-			} else {
-
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.RECORD_AUDIO},
-						MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
-			}
-		}
-		if (ContextCompat.checkSelfPermission(this,
-				Manifest.permission.GET_ACCOUNTS)
-				!= PackageManager.PERMISSION_GRANTED) {
-
-			// Should we show an explanation?
-			if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-					Manifest.permission.GET_ACCOUNTS)) {
-
-			} else {
-
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.GET_ACCOUNTS},
-						MY_PERMISSIONS_REQUEST_GET_ACCOUNTS);
-			}
-		}
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-		switch (requestCode) {
-			case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
-				// If request is cancelled, the result arrays are empty.
-				if (grantResults.length > 0
-						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
-					Util.copyAssetsFilesToSdCard(this);
-
-					// permission was granted, yay! Do the
-					// contacts-related task you need to do.
-
-				} else {
-					Toast.makeText(this, "Permission not granted", Toast.LENGTH_SHORT).show();
-
-					// permission denied, boo! Disable the
-					// functionality that depends on this permission.
-				}
-			}
-			case MY_PERMISSIONS_REQUEST_RECORD_AUDIO: {
-				if (grantResults.length > 0
-						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					Toast.makeText(this, "Record Audio Permission granted", Toast.LENGTH_SHORT).show();
-				} else {
-					Toast.makeText(this, "Record Audio Permission not granted", Toast.LENGTH_SHORT).show();
-				}
-			}
-			case MY_PERMISSIONS_REQUEST_GET_ACCOUNTS: {
-				if (grantResults.length > 0
-						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					Toast.makeText(this, "Get Accounts Permission granted", Toast.LENGTH_SHORT).show();
-				} else {
-					Toast.makeText(this, "Get Accounts Permission not granted", Toast.LENGTH_SHORT).show();
-				}
-			}
-		}
 	}
 
 	public void createKWSFile() {

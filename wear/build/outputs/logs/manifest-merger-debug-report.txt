@@ -1,78 +1,78 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:2:1-29:12
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:2:1-29:12
 	package
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:3:5-45
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:3:5-45
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
 	android:versionName
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:2:11-69
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:2:11-69
 	android:versionCode
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
 meta-data#com.google.android.wearable.standalone
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:5:5-7:32
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:5:5-7:32
 	android:value
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:7:9-29
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:7:9-29
 	android:name
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:6:9-62
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:6:9-62
 uses-feature#android.hardware.type.watch
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:9:5-64
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:9:5-64
 	android:name
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:9:19-61
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:9:19-61
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:11:5-81
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:11:5-81
 	android:name
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:11:22-78
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:11:22-78
 uses-permission#android.permission.RECORD_AUDIO
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:12:5-71
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:12:5-71
 	android:name
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:12:22-68
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:12:22-68
 application
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:14:5-27:19
-MERGED from [com.google.android.support:wearable:2.0.0] C:\Users\Ando\.android\build-cache\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\output\AndroidManifest.xml:6:5-19
-MERGED from [com.android.support:percent:23.0.1] C:\Users\Ando\.android\build-cache\d0f5924a2cd21201326925c55ad9cea338c8f8b4\output\AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:support-v4:23.0.1] C:\Users\Ando\.android\build-cache\7ed6c800ad70fc9e31b6d4afa3e4bfbcd9e3a511\output\AndroidManifest.xml:22:5-20
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:14:5-27:19
+MERGED from [com.google.android.support:wearable:2.0.0] C:\Users\Ando\.android\build-cache\6ad2e03bb768324f574d153acca1c96baaabf982\output\AndroidManifest.xml:6:5-19
+MERGED from [com.android.support:percent:23.0.1] C:\Users\Ando\.android\build-cache\f18c28c8d0e1f8d61abd43f1662f07f5a807b852\output\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.0.1] C:\Users\Ando\.android\build-cache\1cb9d8d1b99d3e69aa0cd5a52cfd4ff23c865b4a\output\AndroidManifest.xml:22:5-20
 	android:label
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:17:9-41
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:17:9-41
 	android:supportsRtl
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:18:9-35
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:18:9-35
 	android:allowBackup
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:15:9-36
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:15:9-36
 	android:icon
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:16:9-43
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:16:9-43
 	android:theme
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:19:9-59
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:19:9-59
 activity#edu.cmu.pocketsphinx.demo.wear.WearActivity
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:20:9-26:20
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:20:9-26:20
 	android:label
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:20:48-80
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:20:48-80
 	android:name
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:20:19-47
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:20:19-47
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:21:13-25:29
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:21:13-25:29
 action#android.intent.action.MAIN
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:22:17-69
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:22:17-69
 	android:name
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:22:25-66
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:22:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:24:17-77
+ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:24:17-77
 	android:name
-		ADDED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml:24:27-74
+		ADDED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml:24:27-74
 uses-sdk
-INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml reason: use-sdk injection requested
-MERGED from [PB-Bible:aars:unspecified] C:\Users\Ando\.android\build-cache\b83cb9b797334b20fa1ae6530bfe13d73103bad3\output\AndroidManifest.xml:7:5-9:41
-MERGED from [PB-Bible:models:unspecified] C:\Felix I-O\PB-Bible\models\build\intermediates\bundles\default\AndroidManifest.xml:7:5-9:41
-MERGED from [com.google.android.support:wearable:2.0.0] C:\Users\Ando\.android\build-cache\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\output\AndroidManifest.xml:4:5-72
-MERGED from [com.android.support:percent:23.0.1] C:\Users\Ando\.android\build-cache\d0f5924a2cd21201326925c55ad9cea338c8f8b4\output\AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:recyclerview-v7:23.0.1] C:\Users\Ando\.android\build-cache\b085e200c7cffdc6f2506e2aa294754b007d3f84\output\AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:support-v4:23.0.1] C:\Users\Ando\.android\build-cache\7ed6c800ad70fc9e31b6d4afa3e4bfbcd9e3a511\output\AndroidManifest.xml:20:5-43
+INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml reason: use-sdk injection requested
+MERGED from [PB-Bible:aars:unspecified] C:\Users\Ando\.android\build-cache\7e3fb770518d17b4fd164a603a06c521deda4551\output\AndroidManifest.xml:7:5-9:41
+MERGED from [PB-Bible:models:unspecified] C:\FelixIO\PB-Bible\models\build\intermediates\bundles\default\AndroidManifest.xml:7:5-9:41
+MERGED from [com.google.android.support:wearable:2.0.0] C:\Users\Ando\.android\build-cache\6ad2e03bb768324f574d153acca1c96baaabf982\output\AndroidManifest.xml:4:5-72
+MERGED from [com.android.support:percent:23.0.1] C:\Users\Ando\.android\build-cache\f18c28c8d0e1f8d61abd43f1662f07f5a807b852\output\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:recyclerview-v7:23.0.1] C:\Users\Ando\.android\build-cache\d599e99007485999f326a6d37ed14baa80131a4b\output\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.0.1] C:\Users\Ando\.android\build-cache\1cb9d8d1b99d3e69aa0cd5a52cfd4ff23c865b4a\output\AndroidManifest.xml:20:5-43
 	android:targetSdkVersion
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
-		INJECTED from C:\Felix I-O\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml
+		INJECTED from C:\FelixIO\PB-Bible\wear\src\main\AndroidManifest.xml

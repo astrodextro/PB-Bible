@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "C:\\Felix I-O\\PB-Bible\\wear\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v23\\values-v23.xml",
+        "outputFile": "C:\\FelixIO\\PB-Bible\\wear\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v23\\values-v23.xml",
         "map": [
             {
                 "to": {
@@ -12,7 +12,7 @@
                     "endOffset": 216
                 },
                 "from": {
-                    "file": "C:\\Users\\Ando\\.android\\build-cache\\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\\output\\res\\values-v23\\values.xml",
+                    "file": "C:\\Users\\Ando\\.android\\build-cache\\6ad2e03bb768324f574d153acca1c96baaabf982\\output\\res\\values-v23\\values.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 0,
@@ -33,7 +33,7 @@
                     "endOffset": 384
                 },
                 "from": {
-                    "file": "C:\\Users\\Ando\\.android\\build-cache\\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\\output\\res\\values-v23\\values.xml",
+                    "file": "C:\\Users\\Ando\\.android\\build-cache\\6ad2e03bb768324f574d153acca1c96baaabf982\\output\\res\\values-v23\\values.xml",
                     "position": {
                         "startLine": 8,
                         "startColumn": 0,
@@ -54,7 +54,7 @@
                     "endOffset": 789
                 },
                 "from": {
-                    "file": "C:\\Users\\Ando\\.android\\build-cache\\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\\output\\res\\values-v23\\values.xml",
+                    "file": "C:\\Users\\Ando\\.android\\build-cache\\6ad2e03bb768324f574d153acca1c96baaabf982\\output\\res\\values-v23\\values.xml",
                     "position": {
                         "startLine": 12,
                         "startColumn": 0,
@@ -75,7 +75,7 @@
                     "endOffset": 893
                 },
                 "from": {
-                    "file": "C:\\Users\\Ando\\.android\\build-cache\\2c97c43ccd4eda1ae660144f338d9d3cd62e74a6\\output\\res\\values-v23\\values.xml",
+                    "file": "C:\\Users\\Ando\\.android\\build-cache\\6ad2e03bb768324f574d153acca1c96baaabf982\\output\\res\\values-v23\\values.xml",
                     "position": {
                         "startLine": 20,
                         "startColumn": 0,

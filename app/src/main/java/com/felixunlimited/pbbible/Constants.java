@@ -1262,7 +1262,11 @@ public class Constants {
 			"66;21;27",
 			"66;22;21"
 	};
-	public static String[] voiceFriendlyBookNames = {
+    public static final String WEBSERVICE_URL =
+            "http://www.felixunlimited.com/pbbible_webservice.php";
+    public static final String PB_BIBLE_FOLDER_URL =
+                    "http://www.felixunlimited.com/PB-Bible/";
+    public static String[] voiceFriendlyBookNames = {
             "Genesis",
             "Exodus",
             "Leviticus",
@@ -1396,12 +1400,14 @@ public class Constants {
 	public static final String BAE_EMAIl = "bae_email";
 	public static final String BAE_REQUEST = "bae_request";
 	public static final String BAE_RECEIPT = "bae_receipt";
+	public static final String BAE_CONFIRMED = "bae_confirmed";
 	public static final String SCRIPTURES_SYNC = "scriptures_sync";
 	public static final String NOT_NEW_DEVICE_SYNC = "new_device_sync";
 	public static final String NEW_USER = "new_user";
 	public static final String POSITION_BIBLE_NAME = "POSITION_BIBLE_NAME"; //currentBibleFilename
 	public static final String POSITION_BOOK = "POSITION_BOOK"; //currentBibleBookNo
-	public static final String POSITION_CHAPTER = "POSITION_CHAPTER"; //currentChapterIdx
+    public static final String CHAPTER_INDEX = "CHAPTER_INDEX"; //currentChapterIdx
+    public static final String POSITION_CHAPTER = "CHAPTER_NO"; //currentChapterNo
 	public static final String POSITION_VERSE = "POSITION_VERSE"; //currentVerseIdx
 	public static final String POSITION_CATEGORY = "POSITION_CATEGORY"; //currentChapterIdx
 	public static final String FULL_SCREEN = "FULL_SCREEN"; //isFullScreen
@@ -1419,6 +1425,8 @@ public class Constants {
 	public static final String WIDGET_ID = "WIDGET_ID";
 
 	public static final String PREFERENCE_NAME = "com.felixunlimited.pbbible";
+	public static final String PERMISSION_GRANTED = "PERMISSION_GRANTED";
+	public static final String PERMISSION_COUNT = "PERMISSION_COUNT";
 	public static final String PREF_COPIED_FROM_ASSETS = "com.felixunlimited.pbbible.assets";
     public static final String POSITION_NAME = "com.felixunlimited.pbbible.position";
 	public static final String MONTHLY_THEME = "monthly_theme";

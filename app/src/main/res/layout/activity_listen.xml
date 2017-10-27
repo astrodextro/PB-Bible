@@ -4,20 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="4dp"
     tools:context="com.felixunlimited.pbbible.speech.Listen">
 
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="right"
+        android:gravity="end"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:gravity="right"
+            android:layout_gravity="end"
+            android:gravity="end"
             android:orientation="vertical">
 
             <LinearLayout
@@ -36,7 +37,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp" />
+                    android:layout_marginStart="10dp"
+                    android:clickable="false"/>
             </LinearLayout>
 
             <LinearLayout
@@ -57,7 +59,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp" />
+                    android:layout_marginStart="10dp"
+                    android:clickable="false"/>
             </LinearLayout>
 
             <LinearLayout
@@ -76,7 +79,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp" />
+                    android:layout_marginStart="10dp"
+                    android:clickable="false"/>
             </LinearLayout>
 
             <LinearLayout
@@ -95,7 +99,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp" />
+                    android:layout_marginStart="10dp"
+                    android:clickable="false"/>
 
             </LinearLayout>
 
@@ -112,15 +117,32 @@
                 android:id="@+id/autoplay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="AutoPlay" />
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:textSize="16sp"
+                android:switchPadding="16sp"
+                android:showText="true"
+                android:text="AutoPlay"
+                android:textOff="off"
+                android:textOn="on"
+                android:switchTextAppearance="@style/TextAppearance.AppCompat"
+                android:theme="@android:style/Widget.Material.CompoundButton.Switch"
+                />
 
             <Switch
                 android:id="@+id/repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Repeat" />
+                android:layout_marginBottom="10dp"
+                android:textSize="16sp"
+                android:switchPadding="16sp"
+                android:text="Repeat"
+                android:showText="true"
+                android:textOff="off"
+                android:textOn="on"
+                android:switchTextAppearance="@style/TextAppearance.AppCompat"
+                android:theme="@android:style/Widget.Material.CompoundButton.Switch"
+                />
 
             <Button
                 android:id="@+id/btnPlayStop"

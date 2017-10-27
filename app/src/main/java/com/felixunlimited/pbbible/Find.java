@@ -11,10 +11,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -23,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -34,7 +37,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Find extends ListActivity implements OnClickListener, OnItemClickListener {
+public class Find extends ListActivity
+		implements
+		OnClickListener,
+		OnItemClickListener,
+		TextView.OnEditorActionListener {
+
 	private DatabaseHelper databaseHelper;
 	private ProgressDialog pd = null;
 	
@@ -54,9 +62,10 @@ public class Find extends ListActivity implements OnClickListener, OnItemClickLi
 	private ListView viewTestament;
 	
 	private final static String TAG = "Find";
-	
-	private final int MAX_RESULT = 100;
-	
+
+	EditText edtSearch;
+	Spinner spnBible;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,11 +73,14 @@ public class Find extends ListActivity implements OnClickListener, OnItemClickLi
 		setContentView(R.layout.find);
 
 		readPreference();
-		
+		spnBible = (Spinner) findViewById(R.id.spnBible);
+		edtSearch = (EditText) findViewById(R.id.edtSearch);
+		edtSearch.setOnEditorActionListener(this);
+
 		databaseHelper = new DatabaseHelper(this);
 		databaseHelper.open();
 		
-		Spinner spnBible = (Spinner) findViewById(R.id.spnBible);
+//		Spinner spnBible = (Spinner) findViewById(R.id.spnBible);
 		List<String> bibleList = databaseHelper.getBibleNameList();
 		String[] arrBible = new String[bibleList.size()];
 		arrBible = bibleList.toArray(arrBible);
@@ -132,75 +144,102 @@ public class Find extends ListActivity implements OnClickListener, OnItemClickLi
 	public void onClick(View v) {
 		switch (v.getId()) {
 			case R.id.btnSearch:
-				EditText edtSearch = (EditText) findViewById(R.id.edtSearch);
-				Spinner spnBible = (Spinner) findViewById(R.id.spnBible);
-				
-				bibleName = (String) spnBible.getSelectedItem();
-				if (bibleName == null) {
-					Toast.makeText(this, R.string.bibleNameRequired, Toast.LENGTH_LONG).show();
-					return;
-				}
-				StringBuffer searchText = new StringBuffer(edtSearch.getText().toString().trim()); 
-				if (searchText.length() == 0) return;
-				wordsToSearch.clear();
-				while (searchText.indexOf("\"") > -1) {
-					int posStartQuote = searchText.indexOf("\"");
-					if (posStartQuote == searchText.length()-1) {
-						searchText.delete(posStartQuote, searchText.length());
-						continue;
-					}
-					int posEndQuote = searchText.indexOf("\"", posStartQuote+1);
-					if (posEndQuote == -1) {
-						String word = searchText.substring(posStartQuote+1);
-						if (word.length() > 1) {
-							int j = 0;
-							for (String checkWord : wordsToSearch) {
-								if (checkWord.length() < word.length()) {
-									break;
-								}
-								j++;
-							}
-							wordsToSearch.add(j, word.toLowerCase());
-						}
-						searchText.delete(posStartQuote, searchText.length());	
-					} else {
-						String word = searchText.substring(posStartQuote+1, posEndQuote); 
-						if (word.length() > 1) {
-							int j = 0;
-							for (String checkWord : wordsToSearch) {
-								if (checkWord.length() < word.length()) {
-									break;
-								}
-								j++;
-							}
-							wordsToSearch.add(j, word.toLowerCase());
-						}
-						searchText.delete(posStartQuote, posEndQuote+1);
-					}
-				}
-				if (searchText.length() > 0) {
-					String[] arrWords = searchText.toString().split(" ");
-					for (String word : arrWords) {
-						if (word.length() > 1) {
-							int j = 0;
-							for (String checkWord : wordsToSearch) {
-								if (checkWord.length() < word.length()) {
-									break;
-								}
-								j++;
-							}
-							wordsToSearch.add(j, word.toLowerCase());
-						}
-					}
-				}
-				if (wordsToSearch.size() == 0) return;
-				InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		        in.hideSoftInputFromWindow(edtSearch.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+				if (!prepareForSearch()) return;
 				dialogTestament.show();
 				break;
 		}
-	}	
-	
+	}
+
+	private boolean prepareForSearch() {
+		bibleName = (String) spnBible.getSelectedItem();
+		if (bibleName == null) {
+            Toast.makeText(this, R.string.bibleNameRequired, Toast.LENGTH_LONG).show();
+			return false;
+        }
+		StringBuilder searchText = new StringBuilder(edtSearch.getText().toString().trim());
+		if (searchText.length() == 0) return false;
+		wordsToSearch.clear();
+		while (searchText.indexOf("\"") > -1) {
+            int posStartQuote = searchText.indexOf("\"");
+            if (posStartQuote == searchText.length()-1) {
+                searchText.delete(posStartQuote, searchText.length());
+                continue;
+            }
+            int posEndQuote = searchText.indexOf("\"", posStartQuote+1);
+            if (posEndQuote == -1) {
+                String word = searchText.substring(posStartQuote+1);
+                if (word.length() > 1) {
+                    int j = 0;
+                    for (String checkWord : wordsToSearch) {
+                        if (checkWord.length() < word.length()) {
+                            break;
+                        }
+                        j++;
+                    }
+                    wordsToSearch.add(j, word.toLowerCase());
+                }
+                searchText.delete(posStartQuote, searchText.length());
+            } else {
+                String word = searchText.substring(posStartQuote+1, posEndQuote);
+                if (word.length() > 1) {
+                    int j = 0;
+                    for (String checkWord : wordsToSearch) {
+                        if (checkWord.length() < word.length()) {
+                            break;
+                        }
+                        j++;
+                    }
+                    wordsToSearch.add(j, word.toLowerCase());
+                }
+                searchText.delete(posStartQuote, posEndQuote+1);
+            }
+        }
+		if (searchText.length() > 0) {
+            String[] arrWords = searchText.toString().split(" ");
+            for (String word : arrWords) {
+                if (word.length() > 1) {
+                    int j = 0;
+                    for (String checkWord : wordsToSearch) {
+                        if (checkWord.length() < word.length()) {
+                            break;
+                        }
+                        j++;
+                    }
+                    wordsToSearch.add(j, word.toLowerCase());
+                }
+            }
+        }
+		if (wordsToSearch.size() == 0) return false;
+		InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		in.hideSoftInputFromWindow(edtSearch.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		return true;
+	}
+
+	@Override
+	public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+		if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER )) ||
+				actionId == EditorInfo.IME_ACTION_DONE){
+			if (!prepareForSearch()) return false;
+			searchOldTestament = true;
+			searchNewTestament = true;
+			StringBuilder sb = new StringBuilder();
+			sb.append("Searching for: ");
+			for (String word : wordsToSearch) {
+				sb.append("'").append(word).append("', ");
+			}
+			sb.delete(sb.length()-2, sb.length());
+
+			this.pd = ProgressDialog.show(this, getResources().getString(R.string.pleaseWait), sb.toString(), true, false);
+			new SearchingTask(this).execute((Object)null);
+
+			return true;
+		}
+
+
+		return false;
+	}
+
 	private class SearchingTask extends AsyncTask<Object, Void, Object> {
 		private Context context;
 		public SearchingTask(Context context) {
@@ -279,6 +318,7 @@ public class Find extends ListActivity implements OnClickListener, OnItemClickLi
 					sr.setVerse(verse);
 					sr.setContent(Util.parseVerse(line));
 					resultList.add(sr);
+					int MAX_RESULT = 1000;
 					if (resultList.size() == MAX_RESULT) {
 						break;
 					}
@@ -322,7 +362,7 @@ public class Find extends ListActivity implements OnClickListener, OnItemClickLi
 		    if (sr == null) return;
 		    Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
 		    int chapterIdx = Constants.arrBookStart[sr.getBook()-1] + sr.getChapter()-1;
-		    editor.putInt(Constants.POSITION_CHAPTER, chapterIdx);
+		    editor.putInt(Constants.CHAPTER_INDEX, chapterIdx);
 		    editor.putString(Constants.POSITION_BIBLE_NAME, bibleFileName);
 		    editor.commit();
 	        Intent showBibleActivity = new Intent(this, BiblesOffline.class);
@@ -341,7 +381,7 @@ public class Find extends ListActivity implements OnClickListener, OnItemClickLi
 				searchNewTestament = true;
 			}
 			
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append("Searching for: ");
 			for (String word : wordsToSearch) {
 				sb.append("'").append(word).append("', ");

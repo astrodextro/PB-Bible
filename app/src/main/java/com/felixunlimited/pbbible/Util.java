@@ -8,16 +8,12 @@ import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.media.AudioManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.speech.tts.TextToSpeech;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,39 +23,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static android.content.ContentValues.TAG;
-
 public class Util {
-
-	public static TextToSpeech initTTS (final Context context) {
-		TextToSpeech tts = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
-			@Override
-			public void onInit(int status) {
-				if (status == TextToSpeech.SUCCESS) {
-					int result = 0;
-					//result = tts.setLanguage(Locale.JAPAN);
-					if (result == TextToSpeech.LANG_MISSING_DATA
-							|| result == TextToSpeech.LANG_NOT_SUPPORTED) {
-						Toast.makeText(context, "This language is not supported", Toast.LENGTH_SHORT).show();
-					}
-					else{
-						Log.v("TTS","onInit succeeded");
-						//speak(emailid);
-					}
-				} else {
-					Toast.makeText(context, "Initialization failed", Toast.LENGTH_SHORT).show();
-				}
-
-			}
-		});
-		//context.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		return tts;
-	}
 
     public static int getNumberOfChapters(int bookSelected) {
 
@@ -72,7 +40,7 @@ public class Util {
 //            if (numberOfChapters == 1) {
 //                int chapterIndex = (Constants.arrBookStart[bookSelected-1]);
 //                SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
-//                editor.putInt(Constants.POSITION_CHAPTER, chapterIndex);
+//                editor.putInt(Constants.CHAPTER_INDEX, chapterIndex);
 //                editor.commit();
 //            }
         } else {
@@ -89,6 +57,18 @@ public class Util {
             arrayList.add(String.valueOf((i+1)));
         return arrayList;
     }
+
+	public int getBookNo (int chapterIndex) {
+		return Integer.parseInt(Constants.arrVerseCount[chapterIndex].split(";")[0]);
+	}
+
+	public int getChapterNo (int chapterIndex) {
+		return Integer.parseInt(Constants.arrVerseCount[chapterIndex].split(";")[1]);
+	}
+
+	public int getNoOfVerses (int chapterIndex) {
+		return Integer.parseInt(Constants.arrVerseCount[chapterIndex].split(";")[2]);
+	}
 
 	public static ArrayList<String> createBooksList () {
         ArrayList<String> arrayList = new ArrayList<>(Constants.arrActiveBookName.length);
@@ -123,20 +103,6 @@ public class Util {
         }
         return chapterIdx;
     }
-
-    public void speak(TextToSpeech tts, String s){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Log.v(TAG, "Speak new API");
-			Bundle bundle = new Bundle();
-			bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-			tts.speak(s, TextToSpeech.QUEUE_FLUSH, bundle, null);
-		} else {
-			Log.v(TAG, "Speak old API");
-			HashMap<String, String> param = new HashMap<>();
-			param.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_MUSIC));
-			tts.speak(s, TextToSpeech.QUEUE_FLUSH, param);
-		}
-	}
 
 	public static String parseVerse(String verse) {
 		StringBuffer sbVerse = new StringBuffer(verse);
@@ -392,24 +358,6 @@ public class Util {
 		return uniqueID;
 	}
 
-	/**
-	 * Gets the state of Airplane Mode.
-	 *
-	 * @param context
-	 * @return true if enabled.
-	 */
-	@SuppressWarnings("deprecation")
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-	public static boolean isAirplaneModeOn(Context context) {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			return Settings.System.getInt(context.getContentResolver(),
-					Settings.System.AIRPLANE_MODE_ON, 0) != 0;
-		} else {
-			return Settings.Global.getInt(context.getContentResolver(),
-					Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
-		}
-	}
-
 	public static String getEmail(Context context) {
 		AccountManager accountManager = AccountManager.get(context);
 		Account account = getAccount(accountManager);
@@ -432,19 +380,5 @@ public class Util {
 		return account;
 	}
 
-	private static boolean isPhone(Context context){
-		TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-		if(manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE){
-			return true;
-		}
-		return false;
-
-	}
-
-	public static boolean isSimSupport(Context context)
-	{
-		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);  //gets the current TelephonyManager
-		return !(tm.getSimState() == TelephonyManager.SIM_STATE_ABSENT);
-	}
 
 }
