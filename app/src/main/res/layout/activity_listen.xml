@@ -119,30 +119,30 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
-                android:textSize="16sp"
-                android:switchPadding="16sp"
                 android:showText="true"
+                android:switchPadding="16sp"
+                android:switchTextAppearance="@style/TextAppearance.AppCompat"
                 android:text="AutoPlay"
                 android:textOff="off"
                 android:textOn="on"
-                android:switchTextAppearance="@style/TextAppearance.AppCompat"
+                android:textSize="16sp"
                 android:theme="@android:style/Widget.Material.CompoundButton.Switch"
-                />
+                android:thumb="?android:attr/textSelectHandle" />
 
             <Switch
                 android:id="@+id/repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:textSize="16sp"
-                android:switchPadding="16sp"
-                android:text="Repeat"
                 android:showText="true"
+                android:switchPadding="16sp"
+                android:switchTextAppearance="@style/TextAppearance.AppCompat"
+                android:text="Repeat"
                 android:textOff="off"
                 android:textOn="on"
-                android:switchTextAppearance="@style/TextAppearance.AppCompat"
+                android:textSize="16sp"
                 android:theme="@android:style/Widget.Material.CompoundButton.Switch"
-                />
+                android:thumb="?android:attr/textSelectHandle" />
 
             <Button
                 android:id="@+id/btnPlayStop"

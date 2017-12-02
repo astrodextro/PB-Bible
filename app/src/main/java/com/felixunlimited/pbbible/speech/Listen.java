@@ -438,6 +438,10 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
+            if (tts == null) {
+                onDestroy();
+                return;
+            }
 
             int result = tts.setLanguage(Locale.US);
 
@@ -520,14 +524,15 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
             HashMap<String, String> param = new HashMap<>();
             param.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_MUSIC));
             param.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, FINISHED_UTTERANCE_ID);
-            if (currentVerseStart == currentVerse) {
+        String text = Util.parseVerse(verseList.get(currentVerse - 1).getVerse());
+        if (currentVerseStart == currentVerse) {
                 tts.speak(intro, TextToSpeech.QUEUE_ADD, null);
                 tts.playSilence(750, TextToSpeech.QUEUE_ADD, null);
-                tts.speak(Util.parseVerse(verseList.get(currentVerse-1).getVerse()), TextToSpeech.QUEUE_ADD, param);
+                tts.speak(text, TextToSpeech.QUEUE_ADD, param);
             }
             else{
                 tts.playSilence(50, TextToSpeech.QUEUE_ADD, null);
-                tts.speak(Util.parseVerse(verseList.get(currentVerse-1).getVerse()), TextToSpeech.QUEUE_ADD, param);
+                tts.speak(text, TextToSpeech.QUEUE_ADD, param);
 //                    lock.lock();
 //                    try {
 //                        done.await();
@@ -601,6 +606,9 @@ public class Listen extends Activity implements AdapterView.OnItemSelectedListen
                         line = line.substring(0, line.length()-"<CM>".length());
                     }
                 }
+                line = line.replaceAll("<FI>", "[");
+                line = line.replaceAll("<Fi>", "]");
+                line = line.replaceAll("`", "'");
 
                 line = line.replaceAll("<CM>", "\n\n");
                 line = line.replaceAll("\n\n \n\n", "\n\n");

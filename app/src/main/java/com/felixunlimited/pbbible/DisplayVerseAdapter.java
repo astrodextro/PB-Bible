@@ -56,6 +56,7 @@ public class DisplayVerseAdapter extends ArrayAdapter<DisplayVerse> implements O
             TextView txtVerse = (TextView) v.findViewById(R.id.txtVerse);
             txtVerse.setMovementMethod(LinkMovementMethod.getInstance());
             txtVerse.setText(parseVerseForDisplay(verse, v));
+//			Toast.makeText(context, ""+getCount(), Toast.LENGTH_SHORT).show();
 //			if (highlight == 1)
 //				txtVerse.setBackgroundColor(Color.BLUE);
 //			else

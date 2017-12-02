@@ -6,35 +6,31 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class JSONParser {
-    static InputStream is = null;
-    static OutputStream os = null;
-    static JSONObject jObj = null;
-    static String json = "";
+class JSONParser {
 
     // constructor
-    public JSONParser() {
+    JSONParser() {
     }
 
     // function get json from url
     // by making HTTP POST or GET method
-    public JSONObject makeHttpRequest(String url, String method,
-                                      String query, String table) {
+    JSONObject makeHttpRequest(String url, String method,
+                               String query, String table) {
+
+        JSONObject jObj = null;
+        String json = "";
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-        BufferedWriter writer = null;
         URL murl = null;
 
         try {
@@ -44,11 +40,9 @@ public class JSONParser {
         }
         // Making HTTP request
         try {
-            OutputStream out;
-            InputStream in;
 
             // check for request method
-            if(method == "POST"){
+            if(method.equals("POST")){
                 // request method is POST
                 // defaultHttpClient
                 if (murl != null) {
@@ -71,13 +65,13 @@ public class JSONParser {
 
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                         StringBuilder sb = new StringBuilder();
-                        String line = null;
+                        String line;
 
                         // Read Server Response
                         while((line = reader.readLine()) != null)
                         {
                             // Append server response in string
-                            sb.append(line + "\n");
+                            sb.append(line).append("\n");
                         }
 
                         json = sb.toString();
@@ -90,7 +84,7 @@ public class JSONParser {
                 }
 
             }
-            else if(method == "GET"){
+            else if(method.equals("GET")){
 
                 try {
                     // Construct the URL for the OpenMessageMap query
@@ -106,7 +100,7 @@ public class JSONParser {
 
                     // Read the input stream into a String
                     InputStream inputStream = urlConnection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
                     if (inputStream == null) {
                         // Nothing to do.
                         return null;
@@ -118,7 +112,7 @@ public class JSONParser {
                         // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                         // But it does make debugging a *lot* easier if you print out the completed
                         // buffer for debugging.
-                        buffer.append(line + "\n");
+                        buffer.append(line).append("\n");
                     }
 
                     if (buffer.length() == 0) {

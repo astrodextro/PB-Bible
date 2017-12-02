@@ -2,6 +2,7 @@ package com.felixunlimited.pbbible;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -143,11 +144,11 @@ public class DatabaseHelper {
 		try {
 			jsonArray = new JSONArray(jsonData);
 			for (int i = 0; i < jsonArray.length(); i++) {
-				db.execSQL(insertSql, new Object[] {jsonArray.getJSONObject(i).getString("scripture"),
-						jsonArray.getJSONObject(i).getString("category"),
-						jsonArray.getJSONObject(i).getString("timestamp")});
+					db.execSQL(insertSql, new Object[] {jsonArray.getJSONObject(i).getString("scripture"),
+							jsonArray.getJSONObject(i).getString("category"),
+							jsonArray.getJSONObject(i).getString("timestamp")});
 			}
-		} catch (JSONException e) {
+		} catch (JSONException | SQLiteConstraintException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -215,7 +216,7 @@ public class DatabaseHelper {
 			db.execSQL("CREATE TABLE bible_version(id INTEGER PRIMARY KEY, file_name TEXT, last_modified INTEGER, bible_name TEXT, about TEXT, eol_length INTEGER);");
 			db.execSQL("CREATE UNIQUE INDEX idx_bible_version_1 ON bible_version(file_name);");
 			db.execSQL("CREATE TABLE category(id INTEGER PRIMARY KEY, category_name TEXT);");
-			db.execSQL("CREATE TABLE scriptures(id INTEGER PRIMARY KEY AUTOINCREMENT, scripture TEXT, category TEXT, timestamp TEXT);");
+			db.execSQL("CREATE TABLE scriptures(_id INTEGER, scripture TEXT, category TEXT, timestamp TEXT DEFAULT 0, PRIMARY KEY (scripture, category));");
 			db.execSQL("CREATE UNIQUE INDEX idx_category_1 ON category(category_name);");
 			db.execSQL("CREATE TABLE bookmark(id INTEGER PRIMARY KEY, highlighted INTEGER, category_id INTEGER, book INTEGER, chapter INTEGER, verse_start INTEGER, verse_end INTEGER, content TEXT, bible TEXT, bookmark_date TEXT);");
 			db.execSQL("CREATE INDEX idx_bookmark_1 ON bookmark(category_id);");
@@ -611,6 +612,6 @@ public class DatabaseHelper {
 	}
 
 	public Cursor getBaeScriptures () {
-		return db.rawQuery("SELECT * FROM scriptures", null);
+		return db.rawQuery("SELECT * FROM scriptures ORDER BY timestamp DESC", null);
 	}
 }

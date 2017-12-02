@@ -1397,6 +1397,7 @@ public class Constants {
 	public static final String FONT_SIZE = "FONT_SIZE"; //currentFontSize
 	public static final String LANG_ENGLISH = "english";
 	public static final String LANG_BAHASA = "indonesia";
+	public static final String BAE_SYNC = "bae_sync";
 	public static final String BAE_EMAIl = "bae_email";
 	public static final String BAE_REQUEST = "bae_request";
 	public static final String BAE_RECEIPT = "bae_receipt";

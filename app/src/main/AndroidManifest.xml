@@ -22,11 +22,12 @@
             android:label="Speak"
             android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
-        <activity
-            android:name=".speech.PocketSphinxActivity"
-            android:label="@string/app_name" />
+        <!--<activity-->
+            <!--android:name=".speech.PocketSphinxActivity"-->
+            <!--android:label="@string/app_name" />-->
         <activity
             android:name=".BiblesOffline"
+            android:screenOrientation="locked"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name_label"
             android:theme="@style/AppBaseTheme.Dark.NoTitleBar">
@@ -211,6 +212,17 @@
                 android:value="com.felixunlimited.pbbible.BiblesOffline" />
         </activity>
         <activity android:name=".PDFViewer"></activity>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
     </application>
 
 </manifest>

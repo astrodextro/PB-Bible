@@ -26,25 +26,14 @@ import java.nio.file.Files;
 
 public class Util {
 
-    public static boolean downloadFile (Context context,String onlineDir, String filename) {
-        File downloadsDir = new File(Environment.getExternalStorageDirectory(), Constants.DOWNLOAD_FOLDER);
-        if (!downloadsDir.exists())
-            downloadsDir.mkdirs();
-        File file = new File(downloadsDir, filename);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            try {
-                Files.deleteIfExists(file.toPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else if (file.exists())
-            file.delete();
+    public static boolean downloadFile (Context context, String onlineDir, String filename) {
 
         try {
             URL url = new URL(onlineDir+filename);
             URLConnection c = url.openConnection();
             int contentLength = c.getContentLength();
+            if (contentLength < 0)
+                contentLength = 4096;
 //            c.setRequestMethod("GET");
 //            c.setDoOutput(true);
 //            c.connect();
@@ -56,11 +45,27 @@ public class Util {
             dataInputStream.readFully(buffer);
             dataInputStream.close();
 
-            DataOutputStream fos = new DataOutputStream(new FileOutputStream(file));
-            fos.write(buffer);
-            fos.flush();
-            fos.close();
-            return true;
+            if (buffer.length == 0) {
+                File downloadsDir = new File(Environment.getExternalStorageDirectory(), Constants.DOWNLOAD_FOLDER);
+                if (!downloadsDir.exists())
+                    downloadsDir.mkdirs();
+                File file = new File(downloadsDir, filename);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    try {
+                        Files.deleteIfExists(file.toPath());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if (file.exists())
+                    file.delete();
+
+                DataOutputStream fos = new DataOutputStream(new FileOutputStream(file));
+                fos.write(buffer);
+                fos.flush();
+                fos.close();
+                return true;
+            }
 
         } catch (IOException e) {
             e.printStackTrace();

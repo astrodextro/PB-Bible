@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.util.Log;
@@ -58,6 +59,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -356,7 +358,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		menu.add(Menu.NONE, Menu.FIRST+3, Menu.NONE, R.string.copyToClipboard);
 		menu.add(Menu.NONE, Menu.FIRST+4, Menu.NONE, R.string.share);
 		menu.add(Menu.NONE, Menu.FIRST+5, Menu.NONE, R.string.highlight).setVisible(false);
-		menu.add(Menu.NONE, Menu.FIRST+6, Menu.NONE, R.string.send_to_bae).setVisible(false);
+		menu.add(Menu.NONE, Menu.FIRST+6, Menu.NONE, R.string.send_to_bae);
 		menu.add(Menu.NONE, Menu.FIRST+7, Menu.NONE, R.string.send_to_note);
 
 	}
@@ -521,6 +523,8 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		StrictMode.VmPolicy.Builder VmPolicybuilder = new StrictMode.VmPolicy.Builder();
+		StrictMode.setVmPolicy(VmPolicybuilder.build());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (!getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getBoolean(Constants.PERMISSION_GRANTED, false)) {
 				Intent showSplashScreen = new Intent(this, SplashScreen.class);
@@ -617,15 +621,15 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		nextButton.setOnClickListener(this);
 		View txtCurrent = findViewById(R.id.txtCurrent);
 		txtCurrent.setOnClickListener(this);
-/*
-		txtCurrent.setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View view) {
-				startActivity(new Intent(BiblesOffline.this, PocketSphinxActivity.class));
-				return true;
-			}
-		});
-*/
+
+//		txtCurrent.setOnLongClickListener(new View.OnLongClickListener() {
+//			@Override
+//			public boolean onLongClick(View view) {
+//				startActivity(new Intent(BiblesOffline.this, PocketSphinxActivity.class));
+//				return true;
+//			}
+//		});
+
 		View btnFullscreen = findViewById(R.id.btnFullscreen);
 		btnFullscreen.setOnClickListener(this);
 		View btnMenu = findViewById(R.id.btnMenu);
@@ -743,9 +747,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 	private void populateBibleList(String[] arrBibles) {
 		List<String> bibles = new ArrayList<String>();
 		if (arrBibles != null) {
-			for (String bible : arrBibles) {
-				bibles.add(bible);
-			}
+			Collections.addAll(bibles, arrBibles);
 		}
 		populateBibleList(bibles);
 	}
@@ -1562,13 +1564,17 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 						jsonObject.put("timestamp", System.currentTimeMillis());
 						jsonObject.put("category", "bae_sent");
 						jsonArray.put(jsonObject);
-						databaseHelper.insertScriptures(jsonArray.toString());
-						SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
-						editor.putBoolean(Constants.SCRIPTURES_SYNC, false);
+						if (databaseHelper.insertScriptures(jsonArray.toString())) {
+							SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
+							editor.putBoolean(Constants.SCRIPTURES_SYNC, false);
+							Toast.makeText(this, "Sent to BAE", Toast.LENGTH_SHORT).show();
+						}
+						else
+							Toast.makeText(this, "Already sent to BAE", Toast.LENGTH_SHORT).show();
+
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
-					Toast.makeText(this, "sent to BAE", Toast.LENGTH_SHORT).show();
 					startActivity(new Intent(this, BaeActivity.class));
 				} else if (copyOrShare == 'n') {
 					Intent i=new Intent(this, NoteListActivity.class);

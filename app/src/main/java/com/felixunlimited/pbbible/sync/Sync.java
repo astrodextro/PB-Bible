@@ -1,8 +1,8 @@
 package com.felixunlimited.pbbible.sync;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Environment;
 
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.felixunlimited.pbbible.Util.getEmail;
 import static com.felixunlimited.pbbible.Util.getUserID;
 import static java.util.Calendar.LONG;
@@ -35,12 +36,11 @@ public class Sync extends AsyncTask<String, Void, String> {
     private static SharedPreferences.Editor mEditor;
     private static Context mContext;
     public static DatabaseHelper databaseHelper;
-    public SQLiteDatabase sqLiteDatabase;
 
     public Sync(Context context) {
         super();
         mContext = context;
-        mPreferences = mContext.getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE);
+        mPreferences = mContext.getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE);
         databaseHelper = new DatabaseHelper(mContext);
     }
 
@@ -50,16 +50,22 @@ public class Sync extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected String doInBackground(String... params) {
         databaseHelper.open();
-//        if (!mPreferences.getBoolean(Constants.NOT_NEW_DEVICE_SYNC, false)) {
-//            syncNewDevice();
-//        }
-//        if (!mPreferences.getBoolean(Constants.SCRIPTURES_SYNC, false)) {
-//            syncScriptures();
-//        }
-        if (!mPreferences.getString(Constants.MONTH, "").toUpperCase().equals(getInstance().getDisplayName(MONTH, LONG, Locale.getDefault()).toUpperCase())) {
-            syncTheme();
+        if (params.length > 0) {
+            baeSync(mContext, params[0], params[1]);
+        }
+        else {
+            if (!mPreferences.getBoolean(Constants.NOT_NEW_DEVICE_SYNC, false)) {
+                syncNewDevice();
+            }
+            if (!mPreferences.getBoolean(Constants.SCRIPTURES_SYNC, false)) {
+                syncScriptures();
+            }
+
+            if (!mPreferences.getString(Constants.MONTH, "").toUpperCase().equals(getInstance().getDisplayName(MONTH, LONG, Locale.getDefault()).toUpperCase())) {
+                syncTheme();
+            }
         }
         return null;
     }
@@ -67,27 +73,73 @@ public class Sync extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        databaseHelper.close();
+        if (databaseHelper != null)
+            databaseHelper.close();
     }
 
-    public void syncTheme () {
+    private void baeSync(Context context, String baeEmail, String table) {
+
+        if (!Util.isConnected(context)) {
+            context.sendBroadcast((new Intent().putExtra(Constants.BAE_SYNC, "No internet connection")));
+            return;
+        }
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject, response;
+        jsonObject = new JSONObject();
+        try {
+            jsonObject.put("bae_email", baeEmail).put("user_email", com.felixunlimited.pbbible.Util.getEmail(context));
+            response = jsonParser.makeHttpRequest(Constants.WEBSERVICE_URL,"POST", jsonObject.toString(), table);
+            if (response != null) {
+                if (!response.getString("response").equals("error")) {
+                    JSONArray baeJSONArray = response.getJSONArray("bae");
+                    SharedPreferences.Editor editor = context.getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
+                    editor.putInt(Constants.BAE_CONFIRMED, baeJSONArray.getJSONObject(0).getInt("bae_confirm"));
+                    editor.putInt(Constants.BAE_RECEIPT, baeJSONArray.getJSONObject(0).getInt("bae_receipt"));
+                    editor.putInt(Constants.BAE_REQUEST, baeJSONArray.getJSONObject(0).getInt("bae_request"));
+                    editor.putString(Constants.BAE_EMAIl, baeJSONArray.getJSONObject(0).getString("bae_email"));
+                    editor.apply();
+                    Intent intent = new Intent("com.felixunlimited.BroadcastReceiver");
+                    intent.putExtra(Constants.BAE_SYNC, table);
+                    context.sendBroadcast(intent);
+                }
+                else {
+                    Intent intent = new Intent("com.felixunlimited.BroadcastReceiver");
+                    intent.putExtra(Constants.BAE_SYNC, "online database error");
+                    context.sendBroadcast(intent);
+                }
+            }
+            else {
+                Intent intent = new Intent("com.felixunlimited.BroadcastReceiver");
+                intent.putExtra(Constants.BAE_SYNC, "couldn't access server. check your internet connection");
+                context.sendBroadcast(intent);
+            }
+        } catch (JSONException e) {
+            Intent intent = new Intent("com.felixunlimited.BroadcastReceiver");
+            intent.putExtra(Constants.BAE_SYNC, "Exception "+e);
+            context.sendBroadcast(intent);
+            e.printStackTrace();
+        }
+    }
+
+    private void syncTheme() {
         if (Util.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.jpg"))
             if (Util.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.mp3"))
                 if (Util.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.txt")) {
                     File file = new File(Environment.getExternalStorageDirectory(), Constants.DOWNLOAD_FOLDER + "/theme.txt");
                     if (file.exists()) {
-                        FileInputStream fin = null;
+                        FileInputStream fin;
                         try {
                             fin = new FileInputStream(file);
                             InputStreamReader tmp = new InputStreamReader(fin);
                             BufferedReader reader = new BufferedReader(tmp);
-                            String str = "";
+                            String str;
                             StringBuilder buf = new StringBuilder();
                             while ((str = reader.readLine()) != null)
                                 buf.append(str).append("\n");
                             fin.close();
                             str = buf.toString();
-                            SharedPreferences.Editor editor = mContext.getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE).edit();
+                            SharedPreferences.Editor editor = mContext.getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit();
                             editor.putString(Constants.MONTH, str.split("\n")[0]);
                             editor.putString(Constants.MONTHLY_THEME, str.split("\n")[1]);
                             editor.putString(Constants.THEME_SCRIPTURE, str.split("\n")[2]);
@@ -121,13 +173,13 @@ public class Sync extends AsyncTask<String, Void, String> {
             }
     }
 
-    public void syncNewDevice () {
+    private void syncNewDevice() {
 //        sqLiteDatabase = databaseHelper.;
         JSONParser jsonParser = new JSONParser();
         JSONArray userJSONArray;
         JSONArray scripturesJSONArray;
 
-        String response = "";
+        String response;
         JSONObject jsonObject;
         jsonObject = jsonParser.makeHttpRequest(Constants.WEBSERVICE_URL,"POST", getEmail(mContext), "get");
         if (jsonObject != null) {
@@ -139,10 +191,11 @@ public class Sync extends AsyncTask<String, Void, String> {
                 }
                 userJSONArray = jsonObject.getJSONArray("user");
                 mEditor = mPreferences.edit();
-                mEditor.putBoolean(Constants.NOT_NEW_DEVICE_SYNC, false);
+                mEditor.putBoolean(Constants.NOT_NEW_DEVICE_SYNC, true);
                 mEditor.putString(Constants.BAE_EMAIl, userJSONArray.getJSONObject(0).getString("bae_email"));
-                mEditor.putString(Constants.BAE_REQUEST, userJSONArray.getJSONObject(0).getString("bae_request"));
-                mEditor.putString(Constants.BAE_RECEIPT, userJSONArray.getJSONObject(0).getString("bae_receipt"));
+                mEditor.putInt(Constants.BAE_REQUEST, userJSONArray.getJSONObject(0).getInt("bae_request"));
+                mEditor.putInt(Constants.BAE_RECEIPT, userJSONArray.getJSONObject(0).getInt("bae_receipt"));
+                mEditor.putInt(Constants.BAE_CONFIRMED, userJSONArray.getJSONObject(0).getInt("bae_confirm"));
                 mEditor.apply();
 
                 scripturesJSONArray = jsonObject.getJSONArray("scriptures");
@@ -155,7 +208,7 @@ public class Sync extends AsyncTask<String, Void, String> {
             createNewUser(mContext);
     }
 
-    public static void syncScriptures () {
+    private static void syncScriptures() {
         JSONParser jsonParser = new JSONParser();
         JSONObject resp;
         JSONArray scripturesJSONArray, baeJSONArray;
@@ -178,21 +231,11 @@ public class Sync extends AsyncTask<String, Void, String> {
                     mEditor.putInt(Constants.BAE_CONFIRMED, baeJSONArray.getJSONObject(0).getInt("bae_confirm"));
                     mEditor.putString(Constants.BAE_EMAIl, baeJSONArray.getJSONObject(0).getString("bae_email"));
                     mEditor.apply();
-                } else{}
-                    //Toast.makeText(mContext, "Sync failed", Toast.LENGTH_SHORT).show();
+                }
             } catch (JSONException e) {
                 //Toast.makeText(mContext, "Sync failed " + e, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }
     }
-
-    public static void baeRequest() {
-
-    }
-
-    public static void baeReceipt() {
-
-    }
-
 }

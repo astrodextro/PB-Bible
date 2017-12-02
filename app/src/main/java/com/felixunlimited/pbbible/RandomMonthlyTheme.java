@@ -13,12 +13,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.FileProvider;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -195,7 +197,13 @@ public class RandomMonthlyTheme extends Service {
         PendingIntent sharePendingIntent = PendingIntent.getActivity(this, 0, shareTheme(), PendingIntent.FLAG_UPDATE_CURRENT);
 
         RemoteViews expandedView = new RemoteViews(this.getPackageName(), R.layout.random_monthly_theme);
-        Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath()+Constants.DOWNLOAD_FOLDER+"/theme.jpg"));
+        Uri uri;
+        File themeFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + Constants.DOWNLOAD_FOLDER + "/theme.jpg");
+        if (Build.VERSION.SDK_INT > 21) { //use this if Lollipop_Mr1 (API 22) or above
+            uri = FileProvider.getUriForFile(getApplicationContext(), getPackageName()+".fileprovider", themeFile);
+        } else {
+            uri =  Uri.fromFile(themeFile);
+        }
         expandedView.setImageViewUri(R.id.imageView, uri);
         expandedView.setOnClickPendingIntent(R.id.shareButton, sharePendingIntent);
 //        expandedView.setImageViewBitmap(R.id.imageView, BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getAbsolutePath()+Constants.DOCUMENT_FOLDER+"/theme.png"));
@@ -218,9 +226,10 @@ public class RandomMonthlyTheme extends Service {
                 .setPriority(Notification.PRIORITY_MAX)
                 .setContentTitle("Theme for "+month)
                 .setContentText(theme)
+                .setCustomBigContentView(expandedView)
 //                .setDefaults(Notification.DEFAULT_SOUND)
                 .build();
-        notification.bigContentView = expandedView;
+//        notification.bigContentView = expandedView;
 //        NotificationManager mNotificationManager =
 //                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 ////// The id of the channel.

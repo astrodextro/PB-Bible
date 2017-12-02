@@ -2,7 +2,7 @@
 <resources>
     <color name="background">#dd000000</color>
     <color name="background_inverse">#dd000000</color>
-    <color name="white">#FFFFFF</color>
+    <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <!-- brand color: orange -->
     <!--<color name="colorPrimary">#FF9800</color>-->
