@@ -6,11 +6,10 @@
 .DS_Store
 /build
 /captures
-.externalNativeBuild
+.externalNativeBuildgit
 /.idea/
-/wear
-/aars
-/models
+/wear/build
+/models/build
 /PB-Bible
 /PB-Bible1
 /sphinxbase
