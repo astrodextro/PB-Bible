@@ -358,8 +358,8 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		menu.add(Menu.NONE, Menu.FIRST+3, Menu.NONE, R.string.copyToClipboard);
 		menu.add(Menu.NONE, Menu.FIRST+4, Menu.NONE, R.string.share);
 		menu.add(Menu.NONE, Menu.FIRST+5, Menu.NONE, R.string.highlight).setVisible(false);
-		menu.add(Menu.NONE, Menu.FIRST+6, Menu.NONE, R.string.send_to_bae);
-		menu.add(Menu.NONE, Menu.FIRST+7, Menu.NONE, R.string.send_to_note);
+		menu.add(Menu.NONE, Menu.FIRST+6, Menu.NONE, R.string.send_to_bae).setVisible(false);
+		menu.add(Menu.NONE, Menu.FIRST+7, Menu.NONE, R.string.send_to_note).setVisible(false);
 
 	}
 
@@ -1776,14 +1776,14 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 					startActivity(new Intent(this, SelectParallelBible.class));
 				}
 				return true;
-			case R.id.contactAuthor:
-				Intent i = new Intent(Intent.ACTION_SEND);
-				i.setType("message/rfc822");
-				i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"pbfatoyinbo@gmail.com"});
-				i.putExtra(Intent.EXTRA_SUBJECT, "[OpenBibles] Question");
-				i.putExtra(Intent.EXTRA_TEXT   , "");
-			    startActivity(Intent.createChooser(i, "Send mail..."));
-				return true;
+//			case R.id.contactAuthor:
+//				Intent i = new Intent(Intent.ACTION_SEND);
+//				i.setType("message/rfc822");
+//				i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"astrodextro@gmail.com"});
+//				i.putExtra(Intent.EXTRA_SUBJECT, "[OpenBibles] Question");
+//				i.putExtra(Intent.EXTRA_TEXT   , "");
+//			    startActivity(Intent.createChooser(i, "Send mail..."));
+//				return true;
 			case R.id.bookmark:
 				String state = Environment.getExternalStorageState();
 				if (!Environment.MEDIA_MOUNTED.equals(state)) {
@@ -1833,24 +1833,24 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 				iHelp.putExtra(HELP_CONTENT, R.string.help_main);
 				startActivity(iHelp);
 				return true;
-			case R.id.document:
-//				state = Environment.getExternalStorageState();
-//				if (!Environment.MEDIA_MOUNTED.equals(state)) {
-//					Toast.makeText(this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
-//					return true;
-//				}
-//				startActivity(new Intent(this, Documents.class));
-				startActivity(new Intent(this, NoteListActivity.class));
-				return true;
+//			case R.id.document:
+////				state = Environment.getExternalStorageState();
+////				if (!Environment.MEDIA_MOUNTED.equals(state)) {
+////					Toast.makeText(this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
+////					return true;
+////				}
+////				startActivity(new Intent(this, Documents.class));
+//				startActivity(new Intent(this, NoteListActivity.class));
+//				return true;
 			case R.id.settings:
 				gotoPrefs = true;
 				startActivity(new Intent(this, Prefs.class));
-				finish();
+				//finish();
 				return true;
-			case R.id.downloadBookname:
-				gotoPrefs = true;
-				startActivity(new Intent(this, DownloadBookname.class));
-				return true;
+//			case R.id.downloadBookname:
+//				gotoPrefs = true;
+//				startActivity(new Intent(this, DownloadBookname.class));
+//				return true;
 		}
 		return false;
 	}
@@ -1911,6 +1911,7 @@ public class BiblesOffline extends ListActivity implements OnClickListener,
 		aaCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spnCategory.setAdapter(aaCategory);
 	}
+
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (parent == viewHistory) {			

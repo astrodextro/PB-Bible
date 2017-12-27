@@ -24,9 +24,9 @@ public class Prefs extends PreferenceActivity implements Preference.OnPreference
 
 		addPreferencesFromResource(R.xml.settings);
 
-		final ListPreference listLanguage = (ListPreference) this.findPreference("bookLanguage");
-		final ListPreference listColorSchemes = (ListPreference) this.findPreference("prefColorSchemeLabels");
-		bindPreferenceSummaryToValue(findPreference(getString(R.string.prefColorSchemeKey)));
+//		final ListPreference listLanguage = (ListPreference) this.findPreference("bookLanguage");
+//		final ListPreference listColorSchemes = (ListPreference) this.findPreference("prefColorSchemeLabels");
+//		bindPreferenceSummaryToValue(findPreference(getString(R.string.prefColorSchemeKey)));
 
 //		String state = Environment.getExternalStorageState();
 //		if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -67,13 +67,13 @@ public class Prefs extends PreferenceActivity implements Preference.OnPreference
 //		});
 	}
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Intent showBibleActivity = new Intent(this, BiblesOffline.class);
-        showBibleActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(showBibleActivity);
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        Intent showBibleActivity = new Intent(this, BiblesOffline.class);
+//        showBibleActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(showBibleActivity);
+//    }
 
     /**
 	 * Attaches a listener so the summary is always updated with the preference value.

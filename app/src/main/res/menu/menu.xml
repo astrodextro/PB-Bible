@@ -9,9 +9,11 @@
 	<item android:id="@+id/settings"
 		android:title="@string/settings"
 		android:icon="@drawable/menu_settings"/>
+<!--
 	<item android:id="@+id/document"
 		android:title="@string/notes"
 		android:icon="@drawable/menu_document" />
+-->
 	<item android:id="@+id/download"
 		android:title="@string/downloadBible"
 		android:icon="@drawable/menu_import" />
@@ -21,9 +23,19 @@
 	<item android:id="@+id/history"
 		android:title="@string/history" 
 		android:icon="@drawable/menu_history" />
+<!--
 	<item android:id="@+id/downloadBookname"
 		android:title="@string/downloadBookname"
 		android:icon="@drawable/menu_import"/>
+-->
+	<item android:id="@+id/about"
+		android:title="@string/about_label"
+		android:icon="@drawable/menu_about" />
+	<item android:id="@+id/help"
+		android:title="@string/help"
+		android:icon="@drawable/menu_help" />
+
+<!--
 	<group
 		android:id="@+id/contactAuthor"
 		android:checkableBehavior="single"
@@ -55,10 +67,5 @@
 			android:titleCondensed="Exhausted"
 			android:visible="false" />
 	</group>
-	<item android:id="@+id/about"
-		android:title="@string/about_label" 
-		android:icon="@drawable/menu_about" />	
-	<item android:id="@+id/help"
-		android:title="@string/help" 
-		android:icon="@drawable/menu_help" />
+-->
 </menu>

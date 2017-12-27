@@ -9,12 +9,12 @@
 		<!--android:title="@string/prefBookNameTitle"-->
 		<!--android:summary="@string/prefBookNameSummary"-->
 		<!--android:dialogTitle="@string/chooseLanguage" />-->
-	<ListPreference
 		android:key="@string/prefColorSchemeKey"
-		android:title="@string/prefColorSchemeTitle"
-		android:entries="@array/prefColorSchemeLabels"
-		android:entryValues="@array/prefColorSchemeValues"
-		android:defaultValue="@string/prefColorSchemeDefault"
-		android:summary="@string/prefColorSchemeSummary"
-		android:dialogTitle="@string/prefColorSchemeSummary" />
+	<!--<ListPreference-->
+		<!--android:title="@string/prefColorSchemeTitle"-->
+		<!--android:entries="@array/prefColorSchemeLabels"-->
+		<!--android:entryValues="@array/prefColorSchemeValues"-->
+		<!--android:defaultValue="@string/prefColorSchemeDefault"-->
+		<!--android:summary="@string/prefColorSchemeSummary"-->
+		<!--android:dialogTitle="@string/prefColorSchemeSummary" />-->
 </PreferenceScreen>
