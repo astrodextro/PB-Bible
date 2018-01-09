@@ -6,8 +6,10 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
 
-import com.felixunlimited.pbbible.Constants;
-import com.felixunlimited.pbbible.DatabaseHelper;
+import com.felixunlimited.pbbible.models.Constants;
+import com.felixunlimited.pbbible.models.DatabaseHelper;
+import com.felixunlimited.pbbible.utils.SyncUtils;
+import com.felixunlimited.pbbible.utils.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,8 +23,8 @@ import java.io.InputStreamReader;
 import java.util.Locale;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.felixunlimited.pbbible.Util.getEmail;
-import static com.felixunlimited.pbbible.Util.getUserID;
+import static com.felixunlimited.pbbible.utils.Util.getEmail;
+import static com.felixunlimited.pbbible.utils.Util.getUserID;
 import static java.util.Calendar.LONG;
 import static java.util.Calendar.MONTH;
 import static java.util.Calendar.getInstance;
@@ -56,13 +58,13 @@ public class Sync extends AsyncTask<String, Void, String> {
             baeSync(mContext, params[0], params[1]);
         }
         else {
-            if (!mPreferences.getBoolean(Constants.NOT_NEW_DEVICE_SYNC, false)) {
-                syncNewDevice();
-            }
-            if (!mPreferences.getBoolean(Constants.SCRIPTURES_SYNC, false)) {
-                syncScriptures();
-            }
-
+//            if (!mPreferences.getBoolean(Constants.NOT_NEW_DEVICE_SYNC, false)) {
+//                syncNewDevice();
+//            }
+//            if (!mPreferences.getBoolean(Constants.SCRIPTURES_SYNC, false)) {
+//                syncScriptures();
+//            }
+//
             if (!mPreferences.getString(Constants.MONTH, "").toUpperCase().equals(getInstance().getDisplayName(MONTH, LONG, Locale.getDefault()).toUpperCase())) {
                 syncTheme();
             }
@@ -79,7 +81,7 @@ public class Sync extends AsyncTask<String, Void, String> {
 
     private void baeSync(Context context, String baeEmail, String table) {
 
-        if (!Util.isConnected(context)) {
+        if (!SyncUtils.isConnected(context)) {
             context.sendBroadcast((new Intent().putExtra(Constants.BAE_SYNC, "No internet connection")));
             return;
         }
@@ -88,7 +90,7 @@ public class Sync extends AsyncTask<String, Void, String> {
         JSONObject jsonObject, response;
         jsonObject = new JSONObject();
         try {
-            jsonObject.put("bae_email", baeEmail).put("user_email", com.felixunlimited.pbbible.Util.getEmail(context));
+            jsonObject.put("bae_email", baeEmail).put("user_email", Util.getEmail(context));
             response = jsonParser.makeHttpRequest(Constants.WEBSERVICE_URL,"POST", jsonObject.toString(), table);
             if (response != null) {
                 if (!response.getString("response").equals("error")) {
@@ -123,9 +125,9 @@ public class Sync extends AsyncTask<String, Void, String> {
     }
 
     private void syncTheme() {
-        if (Util.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.jpg"))
-            if (Util.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.mp3"))
-                if (Util.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.txt")) {
+        if (SyncUtils.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.jpg"))
+            if (SyncUtils.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.mp3"))
+                if (SyncUtils.downloadFile(mContext, Constants.PB_BIBLE_FOLDER_URL, "theme.txt")) {
                     File file = new File(Environment.getExternalStorageDirectory(), Constants.DOWNLOAD_FOLDER + "/theme.txt");
                     if (file.exists()) {
                         FileInputStream fin;

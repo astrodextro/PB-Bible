@@ -18,16 +18,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppBaseTheme">
         <activity
-            android:name=".Voice"
+            android:name=".ui.activities.Voice"
             android:label="Speak"
-            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <!--<activity-->
             <!--android:name=".speech.PocketSphinxActivity"-->
             <!--android:label="@string/app_name" />-->
         <activity
-            android:name=".BiblesOffline"
-            android:screenOrientation="locked"
+            android:name=".ui.activities.BiblesOfflineActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name_label"
             android:theme="@style/AppBaseTheme.Dark.NoTitleBar">
@@ -38,97 +36,90 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".About"
+            android:name=".ui.activities.AboutActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/about_title"
-            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
-            android:name=".AboutBible"
+            android:name=".ui.activities.AboutBibleActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/aboutbible_title"
-            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
-            android:name=".Bookmarks"
+            android:name=".ui.activities.BookmarksActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/bookmarks_title"
             android:theme="@style/AppBaseTheme.Dark" />
         <activity
-            android:name=".Categories"
+            android:name=".ui.activities.CategoriesActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/categories_title" />
         <activity
-            android:name=".Find"
+            android:name=".ui.activities.FindActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/find_title" />
         <activity
-            android:name=".DownloadBible"
+            android:name=".ui.activities.DownloadBible"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/downloadBible_title" />
         <activity
-            android:name=".DownloadBookmark"
+            android:name=".ui.activities.DownloadBookmark"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/downloadBookmark_title" />
         <activity
-            android:name=".DownloadBookname"
+            android:name=".ui.activities.DownloadBookname"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/downloadBookname_title" />
         <activity
-            android:name=".Help"
+            android:name=".ui.activities.HelpActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/help_title"
-            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
-            android:name=".GoTo"
+            android:name=".ui.activities.GoTo"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/goto_title"
-            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark"
             android:windowSoftInputMode="stateAlwaysVisible" />
         <activity
-            android:name=".SelectParallelBible"
+            android:name=".ui.activities.SelectParallelBible"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/selectParallel_title"
-            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
-            android:name=".BrowseBook"
+            android:name=".ui.activities.BrowseBook"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/browseBook_title" />
         <activity
-            android:name=".BrowseChapter"
+            android:name=".ui.activities.BrowseChapter"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/browseChapter_title" />
         <activity
-            android:name=".Documents"
+            android:name=".ui.activities.DocumentsActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/documents"
             android:theme="@style/AppBaseTheme.Dark" />
         <activity
-            android:name=".DownloadDocument"
+            android:name=".ui.activities.DownloadDocument"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/downloadDocument" />
         <activity
-            android:name=".AboutDocument"
+            android:name=".ui.activities.AboutDocumentActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/aboutdocument_title"
-            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
         <activity
-            android:name=".ReadBible"
+            android:name=".ui.activities.ReadBibleActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/readBible"
             android:theme="@style/AppBaseTheme.Dark.NoTitleBar" />
         <activity
-            android:name=".Prefs"
+            android:name=".ui.activities.SettingsActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/settings" />
         <activity
-            android:name=".ConfigureWidget"
+            android:name=".ui.activities.ConfigureWidgetActivity"
             android:label="@string/configureWidget"
-            android:screenOrientation="locked"
             android:theme="@style/AppBaseTheme.Dialog.Dark">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -146,44 +137,43 @@
         </receiver>
 
         <activity
-            android:name=".notes.NoteListActivity"
+            android:name=".ui.activities.NoteListActivity"
             android:label="@string/title_note_list"
-            android:parentActivityName=".BiblesOffline"
+            android:parentActivityName=".ui.activities.BiblesOfflineActivity"
             android:theme="@style/AppBaseTheme.AppCompat.Dark">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.felixunlimited.pbbible.BiblesOffline" />
+                android:value="com.felixunlimited.pbbible.ui.activities.BiblesOfflineActivity" />
         </activity>
         <activity
-            android:name=".notes.NoteDetailActivity"
+            android:name=".ui.activities.NoteDetailActivity"
             android:label="@string/title_note_detail"
-            android:parentActivityName=".notes.NoteListActivity"
+            android:parentActivityName=".ui.activities.NoteListActivity"
             android:theme="@style/AppBaseTheme.AppCompat.Dark">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.felixunlimited.pbbible.notes.NoteListActivity" />
+                android:value="com.felixunlimited.pbbible.ui.activities.NoteListActivity" />
         </activity>
 
         <service
-            android:name=".RandomMonthlyTheme"
+            android:name=".services.RandomMonthlyTheme"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".speech.GeneralSpeechRecognizerService"
+            android:name=".services.GeneralSpeechRecognizerService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name=".speech.GeneralSpeechRecognizerActivity"
+            android:name=".ui.activities.GeneralSpeechRecognizerActivity"
             android:label="@string/title_activity_general_speech_recognizer" />
         <activity
-            android:name=".browse.BrowseBible"
-            android:screenOrientation="locked"
+            android:name=".ui.activities.BrowseBibleActivity"
             android:theme="@style/AppBaseTheme.AppCompat.Dialog.Dark" />
         <activity
-            android:name=".speech.Listen"
+            android:name=".ui.activities.ListenActivity"
             android:label="@string/title_activity_listen"
-            android:parentActivityName=".BiblesOffline"
+            android:parentActivityName=".ui.activities.BiblesOfflineActivity"
             android:screenOrientation="locked"
             android:theme="@android:style/Theme.Dialog">
             <meta-data
@@ -191,27 +181,27 @@
                 android:resource="@xml/searchable" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.felixunlimited.pbbible.BiblesOffline" />
+                android:value="com.felixunlimited.pbbible.ui.activities.BiblesOfflineActivity" />
         </activity>
         <activity
-            android:name=".sync.BaeActivity"
+            android:name=".ui.activities.BaeActivity"
             android:label="@string/title_activity_bae"
-            android:parentActivityName=".BiblesOffline">
+            android:parentActivityName=".ui.activities.BiblesOfflineActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.felixunlimited.pbbible.BiblesOffline" />
+                android:value="com.felixunlimited.pbbible.ui.activities.BiblesOfflineActivity" />
         </activity>
         <activity
-            android:name=".SplashScreen"
+            android:name=".ui.activities.SplashScreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_splash_screen"
-            android:parentActivityName=".BiblesOffline"
+            android:parentActivityName=".ui.activities.BiblesOfflineActivity"
             android:theme="@style/FullscreenTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.felixunlimited.pbbible.BiblesOffline" />
+                android:value="com.felixunlimited.pbbible.ui.activities.BiblesOfflineActivity" />
         </activity>
-        <activity android:name=".PDFViewer"></activity>
+        <activity android:name=".ui.activities.PDFViewer"></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

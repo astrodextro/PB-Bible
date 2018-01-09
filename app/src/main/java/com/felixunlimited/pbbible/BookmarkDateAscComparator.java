@@ -1,5 +1,8 @@
 package com.felixunlimited.pbbible;
 
+import com.felixunlimited.pbbible.models.Bookmark;
+import com.felixunlimited.pbbible.models.Constants;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;

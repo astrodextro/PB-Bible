@@ -12,5 +12,5 @@
     android:paddingEnd="16dp"
     android:paddingStart="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.felixunlimited.pbbible.notes.NoteListActivity"
+    tools:context="com.felixunlimited.pbbible.ui.activities.NoteListActivity"
     tools:listitem="@layout/note_list_content" />

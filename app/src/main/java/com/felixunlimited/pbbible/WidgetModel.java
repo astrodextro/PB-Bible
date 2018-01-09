@@ -10,6 +10,8 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.Log;
 
+import com.felixunlimited.pbbible.models.Constants;
+
 public class WidgetModel {
 	private String bookLanguage;
 	private String bibleFileName;

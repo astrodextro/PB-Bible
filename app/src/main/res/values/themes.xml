@@ -3,7 +3,6 @@
     <style name="AppBaseTheme" parent="Theme.AppCompat">
     </style>
 
-
     <style name="AppBaseTheme.Dark">
         <item name="textBible">@style/text_dark</item>
     </style>
@@ -12,8 +11,9 @@
     </style>
 
     <!--No Title Bar Theme-->
-    <style name="AppBaseTheme.Dark.NoTitleBar" parent="@android:style/Theme.NoTitleBar">
-        <item name="textBible">@style/text_dark</item>
+    <style name="AppBaseTheme.Dark.NoTitleBar" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+        <item name="android:popupMenuStyle">@null</item>
+        <!--<item name="textBible">@style/text_dark</item>-->
     </style>
     <style name="AppBaseTheme.Light.NoTitleBar" parent="@android:style/Theme.NoTitleBar">
         <item name="textBible">@style/text_light</item>

@@ -74,7 +74,7 @@
     <string name="importFrom">Import From:</string>
     <string name="clearBookmark">Clear Bookmark</string>
     <string name="reallyClearBookmark">Do you want to clear all bookmarks in this category? </string>
-    <string name="selectBible">Select Bible :</string>
+    <string name="selectBibleVersion">Select Bible Version :</string>
 
     <string name="downloadBookmark_title">Bibles - Import Bookmark from Internet</string>
     <string name="confirmImport">Confirm Import</string>
@@ -150,14 +150,21 @@
 
     <string name="help">Help</string>
     <string name="help_title">Bibles - Help</string>
-    <string name="help_main"><b>Tap on Book Name:</b> Going to specific book and chapter.\ne.g.: \ntype <i>1jo</i> to jump into <i>1 John</i>,\ntype <i>ps</i> to jump into <i>Psalm</i>.\nType chapter number only to stay on the same book.\n\n<b>Long press on verse text:</b> Bookmark, Share, Copy verse</string>
-    <string name="help_downloadBible"><b>URL:</b> Choose URL of Bible Repository\n\nDownloaded file will be extracted on <i>/sdcard/PB-Bible/Bible.</i>\nYou also can download bible file from PC and extract .zip file into that folder.\n\nBible Format is in UTF-8 plain text (one verse per line) with three lines bible information at the bottom\n\nRecognized tag on bible text is subset of <a href="http://theword.net">theword.net</a> .ont file:\n
-	&lt;TS&gt;...&lt;Ts&gt; : Heading\n
-	&lt;FR&gt;...&lt;Fr&gt; : Word of Jesus\n
-	&lt;RF&gt;...&lt;Rf&gt; : Footnote\n
-	&lt;CM&gt; : New Paragraph\n
-	&lt;CL&gt; : New Line\n
-\nContact <a href="mailto:yohan.yudanara@gmail.com">yohan.yudanara@gmail.com</a> for more information
+    <string name="help_main">
+        <b>Tap on Book Name:</b>
+        Going to specific book and chapter.\ne.g.: \ntype <i>1jo</i> to jump into <i>1 John</i>,\ntype <i>ps</i> to jump into <i>Psalm</i>.\nType chapter number only to stay on the same book.\n\n
+        <b>Long press on verse text:</b> Bookmark, Share, Copy verse\n\n
+        <b>Long press on next / previous button:</b> Jump to next / previous book\n\n
+        <b>Long press on voice button:</b> Activate voice recognition\n\n
+        <b>Long press on bible version <i>(bottom of page):</i> </b> Go to download page\n\n
+    </string>
+    <string name="help_downloadBible"><b>URL:</b> Choose URL of Bible Repository\n\nDownloaded file will be extracted on <i>/sdcard/PB-Bible/Bible.</i>\nYou also can download bible file from PC and extract .zip file into that folder.\n\nBible Format is in UTF-8 plain text (one verse per line) with three lines bible information at the bottom\n\nRecognized tag on bible text is subset of <a href="http://theword.net">theword.net</a><![CDATA[ .ont file:\n
+	<TS>…<Ts> : Heading\n
+	<FR>…<Fr> : Word of Jesus\n
+	<RF>…<Rf> : Footnote\n
+	<CM> : New Paragraph\n
+	<CL> : New Line\n
+\nContact ]]><a href="mailto:pbbible@felixunlimited.com">pbbible@felixunlimited.com</a> for more information
 	</string>
     <string name="help_find">Search result will display verses that contains ALL the words you entered.\n\nUse quotes to search for exact phrases, e.g: \"merry heart\".\n\nOnly first 100 results will be displayed.
 	</string>

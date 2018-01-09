@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.felixunlimited.pbbible.sync.BaeActivity">
+    tools:context="com.felixunlimited.pbbible.ui.activities.BaeActivity">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

@@ -136,7 +136,7 @@
             android:theme="@style/AppBaseTheme.AppCompat.Dark">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.felixunlimited.pbbible.BiblesOffline" />
+                android:value="com.felixunlimited.pbbible.ui.activities.BiblesOfflineActivity" />
         </activity>
         <activity
             android:name=".notes.NoteDetailActivity"
@@ -145,7 +145,7 @@
             android:theme="@style/Theme.AppCompat">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.felixunlimited.pbbible.notes.NoteListActivity" />
+                android:value="com.felixunlimited.pbbible.ui.activities.NoteListActivity" />
         </activity>
 
         <service

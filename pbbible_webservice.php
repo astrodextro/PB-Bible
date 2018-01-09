@@ -14,10 +14,10 @@
 		  $n = 0;
 		  $bae_scriptures = [];
 		  //if ()
-		  foreach ($queries[0] as $query)
-		  {
-			  $resp = "error inserting";
-			  // Insert into / update specific user
+		    foreach ($queries[0] as $query)
+		    {
+			    $resp = "error inserting";
+			    // Insert into / update specific user
 				if(query("INSERT INTO ".str_replace(".","_",str_replace("@", "_", $query["user_email"]))."(scripture, category, timestamp) VALUES (?,?,?) ON DUPLICATE KEY UPDATE timestamp = ?", $query["scripture"], $query["category"], $query["timestamp"], $query["timestamp"]) !== false)
 				{
 					$n++;
@@ -25,12 +25,12 @@
 			}
 			if ($n > 0)
 				$resp = "inserted";
-			if (($bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $queries[0][0]["user_email"]) !== false))
+			if (($bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $queries[0][0]["user_email"])) !== false)
 				if (($bae_scriptures = query("SELECT * FROM ".str_replace(".","_",str_replace("@", "_", $bae[0]["user_email"])))) !== false) {
 					echo json_encode(["response" => $resp, "scriptures" => $bae_scriptures, "bae" => $bae]);
 					exit;
 				}
-//C:\Felix I-O\VoiceRecognition\sphinxbase\bin\Debug\x64>sphinx_fe -argfile en-us/feat.params \ -samprate 16000 -c arctic20.fileids \ -di . -do . -ei wav -eo mfc -mswav yes
+	//C:\Felix I-O\VoiceRecognition\sphinxbase\bin\Debug\x64>sphinx_fe -argfile en-us/feat.params \ -samprate 16000 -c arctic20.fileids \ -di . -do . -ei wav -eo mfc -mswav yes
 			echo json_encode(["response" => "error"]);
 			exit;
 		}
@@ -46,12 +46,12 @@
 			$n = 0;
 			$query = $queries[0];
 			$bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"]);
-			if ($bae["bae_confirm"] == 1) {
+			if ($bae[0]["bae_confirm"] == 1) {
 				echo json_encode(["response" => "confirmed", "bae" => $bae]);
 				exit;
 			}
-			else if (query("INSERT INTO pb_bible_users(bae_request, bae_receipt, bae_confirm, bae_email) VALUES(0,0,0,'') WHERE user_email = ?", $query["user_email"]) !== false)
-				if (query("INSERT INTO pb_bible_users(bae_request, bae_receipt, bae_confirm, bae_email) VALUES(0,0,0,'') WHERE user_email = ?", $query["bae_email"]) !== false)
+			else if (query("UPDATE pb_bible_users SET bae_request = 0, bae_receipt = 0, bae_confirm = 0, bae_email = '' WHERE user_email = ?", $query["user_email"]) !== false)
+				if (query("UPDATE pb_bible_users SET bae_request = 0, bae_receipt = 0, bae_confirm = 0, bae_email = '' WHERE user_email = ?", $query["bae_email"]) !== false)
 				{
 					echo json_encode(["response" => "deleted", "bae" => query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"])]);
 					exit;
@@ -65,14 +65,15 @@
 			$queries[] = json_decode(urldecode($_POST["query"]), true);
 			$n = 0;
 			$query = $queries[0];
+
 			$bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"]);
 
-			if ($bae["bae_confirm"] == 1) {
+			if ($bae[0]["bae_confirm"] == 1) {
 				echo json_encode(["response" => "confirmed", "bae" => $bae]);
 				exit;
 			}
-			else if (query("INSERT INTO pb_bible_users(bae_email, bae_request) VALUES(?,1) WHERE user_email = ?", $query["bae_email"], $query["user_email"]) !== false)
-				if (query("INSERT INTO pb_bible_users(bae_email, bae_receipt) VALUES(?,1) WHERE user_email = ?", $query["user_email"], $query["bae_email"]) !== false)
+			else if (query("UPDATE pb_bible_users SET bae_email = ?, bae_request = 1 WHERE user_email = ?", $query["bae_email"], $query["user_email"]) !== false)
+				if (query("UPDATE pb_bible_users SET bae_email = ?, bae_receipt = 1 WHERE user_email = ?", $query["user_email"], $query["bae_email"]) !== false)
 				{
 					$bae = query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"]);
 					echo json_encode(["response" => "pending", "bae" => $bae]);
@@ -88,8 +89,8 @@
 			$n = 0;
 			$query = $queries[0];
 			
-			if (query("INSERT INTO pb_bible_users(bae_request, bae_receipt, bae_confirm, bae_email) VALUES(0,0,1,?) WHERE user_email = ?", $query{"bae_email"}, $query["user_email"]) !== false)
-				if (query("INSERT INTO pb_bible_users(bae_request, bae_receipt, bae_confirm, bae_email) VALUES(0,0,1,?) WHERE user_email = ?", $query{"user_email"}, $query["bae_email"]) !== false)
+			if (query("UPDATE pb_bible_users SET bae_request = 0, bae_receipt = 0, bae_confirm = 1 bae_email = ? WHERE user_email = ?", $query{"bae_email"}, $query["user_email"]) !== false)
+				if (query("UPDATE pb_bible_users SET bae_request = 0, bae_receipt = 0, bae_confirm = 1 bae_email = ? WHERE user_email = ?", $query{"user_email"}, $query["bae_email"]) !== false)
 				{
 					echo json_encode(["response" => "confirmed", "bae" => query("SELECT * FROM pb_bible_users WHERE user_email = ?", $query["user_email"])]);
 					exit;

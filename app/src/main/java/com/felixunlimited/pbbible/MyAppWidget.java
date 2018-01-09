@@ -1,11 +1,5 @@
 package com.felixunlimited.pbbible;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -22,8 +16,20 @@ import android.text.style.StyleSpan;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.felixunlimited.pbbible.models.Bookmark;
+import com.felixunlimited.pbbible.models.Constants;
+import com.felixunlimited.pbbible.models.DatabaseHelper;
+import com.felixunlimited.pbbible.ui.activities.BiblesOfflineActivity;
+import com.felixunlimited.pbbible.utils.Util;
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+
 public class MyAppWidget extends AppWidgetProvider {
-	private static final String TAG = "BiblesOffline";
+	private static final String TAG = "BiblesOfflineActivity";
 	
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager,
@@ -126,7 +132,7 @@ public class MyAppWidget extends AppWidgetProvider {
 			views.setTextViewText(R.id.txtContent, "[No bookmark available]");
 		}
 		if (bm != null) {
-			Intent mainIntent = new Intent(context, BiblesOffline.class);
+			Intent mainIntent = new Intent(context, BiblesOfflineActivity.class);
 			mainIntent.setData(Uri.parse("file:///mainIntent" + appWidgetId));
 			mainIntent.putExtra(Constants.FROM_WIDGET, true);
 			mainIntent.putExtra(Constants.WIDGET_BIBLE, bm.getBible());

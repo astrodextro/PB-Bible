@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.felixunlimited.pbbible"
-        minSdkVersion 15
-        targetSdkVersion 26
+        minSdkVersion 14
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -19,18 +19,21 @@ android {
     }
 }
 
+def supportSDKVersion = "27.0.2"
 dependencies {
+     compile 'com.android.support:support-v4:'+supportSDKVersion
+    compile 'com.android.support:design:'+supportSDKVersion
+    compile 'com.android.support:recyclerview-v7:'+supportSDKVersion
+    compile 'com.android.support:support-v13:'+supportSDKVersion
+
 //    compile project(':aars')
 //    compile project(':models')
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha7'
-    compile 'com.android.support:support-v4:26.+'
-    compile 'com.android.support:design:26.+'
-    compile 'com.android.support:recyclerview-v7:26.+'
-    compile 'com.android.support:support-v13:26.+'
+    compile 'com.android.support:appcompat-v7:'
+    compile 'com.android.support.constraint:constraint-layout:1.1.0-beta4'
     testCompile 'junit:junit:4.12'
 }

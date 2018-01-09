@@ -10,10 +10,10 @@
     android:dividerPadding="20dp"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context="com.felixunlimited.pbbible.notes.NoteListActivity">
+    tools:context="com.felixunlimited.pbbible.ui.activities.NoteListActivity">
 
     <!--
-    This layout is a two-pane layout for the Util
+    This layout is a two-pane layout for the NotePadUtils
     master/detail flow.
     
     -->
@@ -28,7 +28,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginBottom="30dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context="com.felixunlimited.pbbible.notes.NoteListActivity"
+        tools:context="com.felixunlimited.pbbible.ui.activities.NoteListActivity"
         tools:listitem="@layout/note_list_content" />
 
     <FrameLayout
