@@ -21,10 +21,11 @@ android {
 
 def supportSDKVersion = "27.0.2"
 dependencies {
-     compile 'com.android.support:support-v4:'+supportSDKVersion
-    compile 'com.android.support:design:'+supportSDKVersion
-    compile 'com.android.support:recyclerview-v7:'+supportSDKVersion
-    compile 'com.android.support:support-v13:'+supportSDKVersion
+    implementation 'com.android.support:support-v4:27.0.2'
+    compile 'com.android.support:support-v4:' + supportSDKVersion
+    compile 'com.android.support:design:' + supportSDKVersion
+    compile 'com.android.support:recyclerview-v7:' + supportSDKVersion
+    compile 'com.android.support:support-v13:' + supportSDKVersion
 
 //    compile project(':aars')
 //    compile project(':models')
