@@ -1,142 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
-	android:baselineAligned="false"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:keepScreenOn="true">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+	<android.support.v4.widget.DrawerLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
 
-	<LinearLayout
-		android:id="@+id/topBar"
-		android:background="#00ffffff"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal">
-
-		<Button
-			android:id="@+id/btnMenu"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginRight="2dp"
-			android:background="@drawable/menu"
-			android:layout_marginEnd="2dp" />
-
-		<Button
-			android:id="@+id/btnFullscreen"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginRight="2dp"
-			android:visibility="gone"
-			android:background="@drawable/fullscreen_button"
-			android:layout_marginEnd="2dp" />
-
-		<Button
-			android:id="@+id/btnPrev"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:background="@drawable/prev_button" />
-
-		<TextView
-			android:id="@+id/txtCurrent"
-			android:layout_width="0dp"
+		<LinearLayout
+			android:orientation="vertical"
+			android:baselineAligned="false"
+			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
-			android:layout_margin="0px"
-			android:layout_weight="1.0"
-			android:background="@drawable/btnfooter_button"
-			android:ellipsize="end"
-			android:gravity="center"
-			android:padding="0px"
-			android:text=""
-			android:textColor="#000000"
-			android:textSize="20sp"
-			android:maxLines="1" />
+			android:keepScreenOn="true">
 
-		<Button
-			android:id="@+id/btnNext"
+			<LinearLayout
+				android:id="@+id/topBar"
+				android:background="#00ffffff"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+
+				<Button
+					android:id="@+id/btnMenu"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginRight="2dp"
+					android:background="@drawable/menu"
+					android:layout_marginEnd="2dp" />
+
+				<Button
+					android:id="@+id/btnFullscreen"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginRight="2dp"
+					android:visibility="gone"
+					android:background="@drawable/fullscreen_button"
+					android:layout_marginEnd="2dp" />
+
+				<Button
+					android:id="@+id/btnPrev"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:background="@drawable/prev_button" />
+
+				<TextView
+					android:id="@+id/txtCurrent"
+					android:layout_width="0dp"
+					android:layout_height="fill_parent"
+					android:layout_margin="0px"
+					android:layout_weight="1.0"
+					android:background="@drawable/btnfooter_button"
+					android:ellipsize="end"
+					android:gravity="center"
+					android:padding="0px"
+					android:text=""
+					android:textColor="#000000"
+					android:textSize="20sp"
+					android:maxLines="1" />
+
+				<Button
+					android:id="@+id/btnNext"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:background="@drawable/next_button" />
+
+				<Button
+					android:id="@+id/btnListen"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginRight="2dp"
+					android:background="@drawable/btn_listen"
+					android:layout_marginEnd="2dp" />
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/linearList"
+				android:layout_height="0dp"
+				android:layout_width="fill_parent"
+				android:layout_weight="1"
+				style="?textBible">
+
+				<ListView
+					android:id="@+id/android:list"
+					android:layout_width="0dp"
+					android:layout_height="fill_parent"
+					android:layout_weight="1"
+					android:divider="@null"
+					android:dividerHeight="0px" />
+
+				<TextView android:id="@+id/txtEmpty"
+					android:textSize="15sp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:visibility="gone"/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/horizontalLine"
+				android:layout_width="fill_parent"
+				android:layout_height="5dip"
+				android:background="#AABBCC"
+				android:orientation="horizontal"
+				android:visibility="gone" />
+
+			<LinearLayout
+				android:id="@+id/linearParallel"
+				android:layout_height="0px"
+				android:layout_width="fill_parent"
+				android:orientation="vertical">
+
+				<ListView
+					android:id="@+id/listviewParallel"
+					android:layout_height="fill_parent"
+					android:layout_width="fill_parent"
+					android:dividerHeight="0px"
+					android:divider="@null" />
+				<TextView android:id="@+id/txtEmpty2"
+					android:textSize="15sp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:visibility="gone"/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/bottomBar"
+				android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				>
+				<Button android:id="@+id/btnZoomOut" android:layout_width="52dp"
+					android:layout_height="28dp"
+					android:background="@drawable/zoomout_button"
+					/>
+				<Button android:id="@+id/btnZoomIn" android:layout_width="52dp"
+					android:layout_height="28dp"
+					android:background="@drawable/zoomin_button"
+					/>
+				<TextView android:id="@+id/txtBibleName"  android:layout_width="fill_parent"
+					android:gravity="center"
+					android:layout_height="wrap_content"
+					android:layout_margin="0px"
+					android:padding="0px"
+					android:textSize="15sp"
+					android:textColor="#000000"
+					android:ellipsize="end" android:singleLine="true"
+					android:background="@drawable/btnfooter_button"	 />
+			</LinearLayout>
+		</LinearLayout>
+
+		<android.support.design.widget.NavigationView
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:background="@drawable/next_button" />
-
-		<Button
-			android:id="@+id/btnListen"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginRight="2dp"
-			android:background="@drawable/btn_listen"
-			android:layout_marginEnd="2dp" />
-	</LinearLayout>
-
-	<LinearLayout
-		android:id="@+id/linearList"
-		android:layout_height="0dp"
-		android:layout_width="fill_parent"
-		android:layout_weight="1"
-		style="?textBible">
-
-		<ListView
-			android:id="@+id/android:list"
-			android:layout_width="0dp"
-			android:layout_height="fill_parent"
-			android:layout_weight="1"
-			android:divider="@null"
-			android:dividerHeight="0px" />
-
-		<TextView android:id="@+id/txtEmpty"
-			android:textSize="15sp"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:visibility="gone"/>
-</LinearLayout>
-
-	<LinearLayout
-		android:id="@+id/horizontalLine"
-		android:layout_width="fill_parent"
-		android:layout_height="5dip"
-		android:background="#AABBCC"
-		android:orientation="horizontal"
-		android:visibility="gone" />
-
-<LinearLayout
-	android:id="@+id/linearParallel"
-    android:layout_height="0px"
-    android:layout_width="fill_parent"
-	android:orientation="vertical">
-
-	<ListView
-		android:id="@+id/listviewParallel"
-		android:layout_height="fill_parent"
-		android:layout_width="fill_parent"
-		android:dividerHeight="0px"
-		android:divider="@null" />
-	<TextView android:id="@+id/txtEmpty2"
-		android:textSize="15sp"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:visibility="gone"/>
-</LinearLayout>
- 
-<LinearLayout
-	android:id="@+id/bottomBar"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-	<Button android:id="@+id/btnZoomOut" android:layout_width="52dp"
-    	android:layout_height="28dp"
-    	android:background="@drawable/zoomout_button"
-    />
-    <Button android:id="@+id/btnZoomIn" android:layout_width="52dp"
-    	android:layout_height="28dp"
-    	android:background="@drawable/zoomin_button"
-    />
-    <TextView android:id="@+id/txtBibleName"  android:layout_width="fill_parent"
-    	android:gravity="center"
-        android:layout_height="wrap_content"
-        android:layout_margin="0px"
-        android:padding="0px"
-        android:textSize="15sp"
-        android:textColor="#000000"
-        android:ellipsize="end" android:singleLine="true"
-        android:background="@drawable/btnfooter_button"	 />
-</LinearLayout>
-</LinearLayout>
+			android:layout_height="match_parent"/>
+	</android.support.v4.widget.DrawerLayout>
+</layout>
