@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.databinding.DataBindingUtil;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -27,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewConfiguration;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -41,6 +44,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.felixunlimited.pbbible.R;
+import com.felixunlimited.pbbible.databinding.BibleOfflineBinding;
 import com.felixunlimited.pbbible.models.BibleVersion;
 import com.felixunlimited.pbbible.models.Bookmark;
 import com.felixunlimited.pbbible.models.Constants;
@@ -104,9 +108,10 @@ import static com.felixunlimited.pbbible.models.Constants.arrBookStart;
 import static com.felixunlimited.pbbible.models.Constants.arrVerseCount;
 import static com.felixunlimited.pbbible.models.Constants.voiceFriendlyBookNames;
 
-public class BiblesOfflineActivity extends ListActivity implements OnClickListener,
+public class BiblesOfflineActivity extends AppCompatActivity implements OnClickListener,
 		DialogInterface.OnClickListener,
-		OnItemClickListener{
+		OnItemClickListener, View.OnTouchListener {
+	private BibleOfflineBinding binding;
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
     private static final String TAG = "BiblesOfflineActivity";
 
@@ -134,10 +139,9 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 	private char copyOrShare; //'c' or 's' or 'b' or 'n' or 'p'
 	
 	private ProgressDialog pd = null;
-	
-	private TextView txtEmpty;
-	private TextView txtEmpty2;
-	
+	private ListView viewBibles;
+	private ListView viewHistory;
+
 	public View getFootnoteView() {
 		return footnoteView;
 	}
@@ -165,24 +169,26 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 	private int lastChapterIdx = 0;
 	
 	private AlertDialog dialogHistory;
-	private ListView viewHistory;
 	private List<Integer> historyList = new ArrayList<Integer>();
 	private DisplayHistoryAdapter historyAdapter;
-    public  View btnListen;
 
     private AlertDialog dialogBibles;
-	private ListView viewBibles;
 	private List<String> bibleList = new ArrayList<String>();
 	private ArrayAdapter<String> biblesAdapter;
 	
 	private boolean isParallel;
 
+	private int mPtrCount = 0;
+
+	private float mPrimStartTouchEventX = -1;
+	private float mPrimStartTouchEventY = -1;
+	private float mSecStartTouchEventX = -1;
+	private float mSecStartTouchEventY = -1;
+	private float mPrimSecStartTouchDistance = 0;
+
 	private int mViewScaledTouchSlop = 0;
 
 	private ScaleGestureDetector mScaleDetector;
-
-	View mGestureView;
-
 //	@Override
 //	public void onItemCheckedStateChanged(ActionMode actionMode, int position, long id, boolean checked) {
 //		Menu menu = actionMode.getMenu();
@@ -352,6 +358,261 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 //	public void onDestroyActionMode(ActionMode actionMode) {
 //		actionMode.finish();
 //	}
+
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		StrictMode.VmPolicy.Builder VmPolicybuilder = new StrictMode.VmPolicy.Builder();
+		StrictMode.setVmPolicy(VmPolicybuilder.build());
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			if (!getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getBoolean(Constants.PERMISSION_GRANTED, false)) {
+				Intent showSplashScreen = new Intent(this, SplashScreen.class);
+				showSplashScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				startActivity(showSplashScreen);
+				finish();
+				return;
+			}
+		}
+		//Util.setTheme(this, R.style.AppBaseTheme_Light_NoTitleBar);
+//        createKWSFile();
+//		if (SyncUtils.isMyServiceRunning(RandomMonthlyTheme.class, this))
+//			stopService(new Intent(BiblesOfflineActivity.this, RandomMonthlyTheme.class));
+		if (!Util.isMyServiceRunning(RandomMonthlyTheme.class, this))
+			startService(new Intent(this, RandomMonthlyTheme.class));
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		
+//		binding = new BibleOfflineBinding();
+		binding = DataBindingUtil.setContentView(this, R.layout.main);
+		bookmarkVerseStart = 1;
+		if (getIntent().getExtras() != null) {
+			this.fromBookmarks = getIntent().getExtras().getBoolean(FROM_BOOKMARKS, false);
+			if (fromBookmarks) {
+				bookmarkVerseStart =  getIntent().getExtras().getInt(BOOKMARK_VERSE_START, 1);
+			}
+			boolean fromWidget = getIntent().getExtras().getBoolean(FROM_WIDGET, false);
+			if (fromWidget) {
+				//this is similar with from bookmarks
+				if (arrActiveBookName[0] != null) {
+					fromBookmarks = true;
+				}
+				bookmarkVerseStart = getIntent().getExtras().getInt(WIDGET_VERSE, 1);
+				String bible = getIntent().getExtras().getString(WIDGET_BIBLE);
+				int book = getIntent().getExtras().getInt(WIDGET_BOOK, 1);
+				int chapter = getIntent().getExtras().getInt(WIDGET_CHAPTER, 1);
+				Editor editor = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE).edit();
+				int chapterIdx = arrBookStart[book-1] + chapter-1;
+				editor.putInt(CHAPTER_INDEX, chapterIdx);
+				editor.putString(POSITION_BIBLE_NAME, bible + ".ont");
+				editor.apply();
+			}
+		}
+
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		binding.verseListView.setEmptyView(binding.txtEmpty);
+//		verseListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+//		verseListView.setMultiChoiceModeListener(this);
+		currentChapterIdx = -1;
+
+		databaseHelper = new DatabaseHelper(this);
+		databaseHelper.open();
+		isOpen = true;
+
+		LayoutInflater li = LayoutInflater.from(this);
+		AlertDialog.Builder builder;
+
+		footnoteView = li.inflate(R.layout.footnote, null);
+		builder = new AlertDialog.Builder(this);
+		builder.setTitle("SyncUtils");
+		builder.setView(footnoteView);
+		builder.setNeutralButton("Close", this);
+		footnoteDialog = builder.create();
+
+		bookmarkView = li.inflate(R.layout.bookmarkdialog, null);
+		builder = new AlertDialog.Builder(this);
+		builder.setTitle("Bookmark");
+		builder.setView(bookmarkView);
+		builder.setPositiveButton("OK", this);
+		builder.setNeutralButton("Cancel", this);
+		bookmarkDialog = builder.create();
+		fillSpinnerCategory();
+		Button btnPlus = (Button) bookmarkView.findViewById(R.id.btnPlus);
+		btnPlus.setOnClickListener(this);
+		Button btnMinus = (Button) bookmarkView.findViewById(R.id.btnMinus);
+		btnMinus.setOnClickListener(this);
+
+		copyToClipboardView = li.inflate(R.layout.copytoclipboarddialog, null);
+		builder = new AlertDialog.Builder(this);
+		builder.setTitle("Copy to clipboard");
+		builder.setView(copyToClipboardView);
+		builder.setPositiveButton("OK", this);
+		builder.setNeutralButton("Cancel", this);
+		copyToClipboardDialog = builder.create();
+		fillSpinnerCategory();
+		Button btnPlusClipboard = (Button) copyToClipboardView.findViewById(R.id.btnPlusClipboard);
+		btnPlusClipboard.setOnClickListener(this);
+		Button btnMinusClipboard = (Button) copyToClipboardView.findViewById(R.id.btnMinusClipboard);
+		btnMinusClipboard.setOnClickListener(this);
+
+		binding.btnPrev.setOnClickListener(this);
+		binding.btnPrev.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View view) {
+				changeBook('p');
+				return true;
+			}
+		});
+
+		binding.btnNext.setOnClickListener(this);
+		binding.btnNext.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View view) {
+				changeBook('n');
+				return true;
+			}
+		});
+
+		binding.txtCurrent.setOnClickListener(this);
+		binding.txtCurrent.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View view) {
+				startActivity(new Intent(BiblesOfflineActivity.this, BrowseBibleActivity.class));
+				return true;
+			}
+		});
+
+//		txtCurrent.setOnLongClickListener(new View.OnLongClickListener() {
+//			@Override
+//			public boolean onLongClick(View view) {
+//				startActivity(new Intent(BiblesOfflineActivity.this, PocketSphinxActivity.class));
+//				return true;
+//			}
+//		});
+
+		binding.btnFullscreen.setOnClickListener(this);
+		binding.btnMenu.setOnClickListener(this);
+//		btnMenu.setOnLongClickListener(new View.OnLongClickListener() {
+//			@Override
+//			public boolean onLongClick(View view) {
+//				startActivity(new Intent(BiblesOfflineActivity.this, PDFViewer.class));
+//				return true;
+//			}
+//		});
+		binding.btnListen.setOnClickListener(this);
+		binding.btnListen.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View view) {
+				startActivity(new Intent(BiblesOfflineActivity.this, Voice.class));
+				return true;
+			}
+		});
+		View btnZoomIn = findViewById(R.id.btnZoomIn);
+		btnZoomIn.setOnClickListener(this);
+		View btnZoomOut = findViewById(R.id.btnZoomOut);
+		btnZoomOut.setOnClickListener(this);
+
+		TextView txtBibleName = (TextView) findViewById(R.id.txtBibleName);
+		txtBibleName.setOnClickListener(this);
+		txtBibleName.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View view) {
+				startActivity(new Intent(BiblesOfflineActivity.this, DownloadBible.class));
+				return true;
+			}
+		});
+
+		AlertDialog.Builder ad = new AlertDialog.Builder(this);
+		ad.setTitle(R.string.selectBibleVersion);
+		biblesAdapter = new ArrayAdapter<String>(this, R.layout.listitemmedium, bibleList);
+		viewBibles = new ListView(this);
+		viewBibles.setAdapter(biblesAdapter);
+		viewBibles.setOnItemClickListener(this);
+		ad.setView(viewBibles);
+		dialogBibles = ad.create();
+		dialogBibles.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		readPreference();
+		Util.copyAssetsFilesToSdCard(this);
+
+		LinearLayout bottomBar = (LinearLayout) findViewById(R.id.bottomBar);
+		if (isFullScreen) {
+			bottomBar.setVisibility(View.GONE);
+		} else {
+			bottomBar.setVisibility(View.VISIBLE);
+		}
+		applyParallel(isParallel);
+
+		adapter = new DisplayVerseAdapter(this, R.layout.row, verseList, currentFontSize);
+		binding.verseListView.setAdapter(adapter);
+		registerForContextMenu(binding.verseListView);
+
+		parallelAdapter = new DisplayVerseAdapter(this, R.layout.row, verseParallelList, currentFontSize);
+		binding.listviewParallel.setAdapter(parallelAdapter);
+		binding.listviewParallel.setEmptyView(binding.txtEmpty2);
+
+		updateBibleFontSize();
+		updateBookLanguage();
+
+		//history dialog
+		ad = new AlertDialog.Builder(this);
+		ad.setTitle(R.string.history);
+		viewHistory = new ListView(this);
+		historyAdapter = new DisplayHistoryAdapter(this, R.layout.listitemmedium, historyList, currentBookLanguage);
+		viewHistory.setAdapter(historyAdapter);
+		viewHistory.setOnItemClickListener(this);
+		ad.setView(viewHistory);
+		dialogHistory = ad.create();
+		dialogHistory.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		if (!fromBookmarks && (savedInstanceState == null)) {
+			// Show the ProgressDialog on this thread
+			this.pd = ProgressDialog.show(this, getResources().getString(R.string.pleaseWait), getResources().getString(R.string.loading), true, false);
+			if (binding.txtEmpty != null) {
+				binding.txtEmpty.setText(getResources().getString(R.string.no_bibles));
+			}
+			new LoadingTask().execute((Object)null);
+		} else {
+			List<String> bibles = databaseHelper.getBibleNameList();
+			populateBibleList(bibles);
+			displayBible(currentBibleFilename, currentChapterIdx);
+		}
+
+		binding.verseListView.setOnScrollListener(new OnScrollListener() {
+			private boolean scroll = false;
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				scroll = scrollState == SCROLL_STATE_FLING || scrollState == SCROLL_STATE_TOUCH_SCROLL;
+			}
+
+			@Override
+			public void onScroll(AbsListView view, final int firstVisibleItem,
+								 int visibleItemCount, int totalItemCount) {
+				if (view.equals(binding.verseListView) && isParallel && scroll) {
+					binding.listviewParallel.post(new Runnable(){
+						public void run() {
+							binding.listviewParallel.setSelection(firstVisibleItem);
+							binding.listviewParallel.setSelected(false);
+						}});
+				}
+			}
+		});
+		(new Sync(this)).execute();
+		//checkVoiceRecognition();
+		final ViewConfiguration viewConfig = ViewConfiguration.get(this);
+		mViewScaledTouchSlop = viewConfig.getScaledTouchSlop();
+		binding.linearList.setOnTouchListener(this);
+//		mScaleDetector = new ScaleGestureDetector(this, new MyPinchListener());
+//		mGestureView.setOnTouchListener(new View.OnTouchListener() {
+//			@Override
+//			public boolean onTouch(View v, MotionEvent event) {
+//				//inspect the event.
+//				mScaleDetector.onTouchEvent(event);
+//				return true;
+//			}
+//		});
+	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,ContextMenu.ContextMenuInfo menuInfo) {
@@ -544,323 +805,6 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 		}
 	}
 
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		StrictMode.VmPolicy.Builder VmPolicybuilder = new StrictMode.VmPolicy.Builder();
-		StrictMode.setVmPolicy(VmPolicybuilder.build());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getBoolean(Constants.PERMISSION_GRANTED, false)) {
-				Intent showSplashScreen = new Intent(this, SplashScreen.class);
-				showSplashScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				startActivity(showSplashScreen);
-				finish();
-				return;
-			}
-		}
-		//Util.setTheme(this, R.style.AppBaseTheme_Light_NoTitleBar);
-//        createKWSFile();
-//		if (SyncUtils.isMyServiceRunning(RandomMonthlyTheme.class, this))
-//			stopService(new Intent(BiblesOfflineActivity.this, RandomMonthlyTheme.class));
-		if (!Util.isMyServiceRunning(RandomMonthlyTheme.class, this))
-			startService(new Intent(this, RandomMonthlyTheme.class));
-		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-		bookmarkVerseStart = 1;
-		if (getIntent().getExtras() != null) {
-			this.fromBookmarks = getIntent().getExtras().getBoolean(FROM_BOOKMARKS, false);
-			if (fromBookmarks) {
-				bookmarkVerseStart =  getIntent().getExtras().getInt(BOOKMARK_VERSE_START, 1);
-			}
-			boolean fromWidget = getIntent().getExtras().getBoolean(FROM_WIDGET, false);
-			if (fromWidget) {
-				//this is similar with from bookmarks
-				if (arrActiveBookName[0] != null) {
-					fromBookmarks = true;
-				}
-				bookmarkVerseStart = getIntent().getExtras().getInt(WIDGET_VERSE, 1);
-				String bible = getIntent().getExtras().getString(WIDGET_BIBLE);
-				int book = getIntent().getExtras().getInt(WIDGET_BOOK, 1);
-				int chapter = getIntent().getExtras().getInt(WIDGET_CHAPTER, 1);
-				Editor editor = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE).edit();
-				int chapterIdx = arrBookStart[book-1] + chapter-1;
-				editor.putInt(CHAPTER_INDEX, chapterIdx);
-				editor.putString(POSITION_BIBLE_NAME, bible + ".ont");
-				editor.apply();
-			}
-		}
-
-		setContentView(R.layout.main);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
-		txtEmpty = findViewById(R.id.txtEmpty);
-		getListView().setEmptyView(txtEmpty);
-//		getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-//		getListView().setMultiChoiceModeListener(this);
-		currentChapterIdx = -1;		
-
-		databaseHelper = new DatabaseHelper(this);
-		databaseHelper.open();
-		isOpen = true;
-
-		LayoutInflater li = LayoutInflater.from(this);
-		AlertDialog.Builder builder;
-		
-		footnoteView = li.inflate(R.layout.footnote, null);
-		builder = new AlertDialog.Builder(this);
-		builder.setTitle("SyncUtils");
-		builder.setView(footnoteView);
-		builder.setNeutralButton("Close", this);
-		footnoteDialog = builder.create();
-		
-		bookmarkView = li.inflate(R.layout.bookmarkdialog, null);
-		builder = new AlertDialog.Builder(this);
-		builder.setTitle("Bookmark");
-		builder.setView(bookmarkView);
-		builder.setPositiveButton("OK", this);
-		builder.setNeutralButton("Cancel", this);
-		bookmarkDialog = builder.create();
-		fillSpinnerCategory();
-		Button btnPlus = (Button) bookmarkView.findViewById(R.id.btnPlus);
-		btnPlus.setOnClickListener(this);
-		Button btnMinus = (Button) bookmarkView.findViewById(R.id.btnMinus);
-		btnMinus.setOnClickListener(this);
-		
-		copyToClipboardView = li.inflate(R.layout.copytoclipboarddialog, null);
-		builder = new AlertDialog.Builder(this);
-		builder.setTitle("Copy to clipboard");
-		builder.setView(copyToClipboardView);
-		builder.setPositiveButton("OK", this);
-		builder.setNeutralButton("Cancel", this);
-		copyToClipboardDialog = builder.create();
-		fillSpinnerCategory();
-		Button btnPlusClipboard = (Button) copyToClipboardView.findViewById(R.id.btnPlusClipboard);
-		btnPlusClipboard.setOnClickListener(this);
-		Button btnMinusClipboard = (Button) copyToClipboardView.findViewById(R.id.btnMinusClipboard);
-		btnMinusClipboard.setOnClickListener(this);
-
-		View prevButton = findViewById(R.id.btnPrev);
-		prevButton.setOnClickListener(this);
-		prevButton.setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View view) {
-                changeBook('p');
-				return true;
-			}
-		});
-
-		View nextButton = findViewById(R.id.btnNext);
-		nextButton.setOnClickListener(this);
-        nextButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                changeBook('n');
-                return true;
-            }
-        });
-
-		View txtCurrent = findViewById(R.id.txtCurrent);
-		txtCurrent.setOnClickListener(this);
-		txtCurrent.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                startActivity(new Intent(BiblesOfflineActivity.this, BrowseBibleActivity.class));
-                return true;
-            }
-        });
-
-//		txtCurrent.setOnLongClickListener(new View.OnLongClickListener() {
-//			@Override
-//			public boolean onLongClick(View view) {
-//				startActivity(new Intent(BiblesOfflineActivity.this, PocketSphinxActivity.class));
-//				return true;
-//			}
-//		});
-
-		View btnFullscreen = findViewById(R.id.btnFullscreen);
-		btnFullscreen.setOnClickListener(this);
-		View btnMenu = findViewById(R.id.btnMenu);
-		btnMenu.setOnClickListener(this);
-//		btnMenu.setOnLongClickListener(new View.OnLongClickListener() {
-//			@Override
-//			public boolean onLongClick(View view) {
-//				startActivity(new Intent(BiblesOfflineActivity.this, PDFViewer.class));
-//				return true;
-//			}
-//		});
-        btnListen = findViewById(R.id.btnListen);
-        btnListen.setOnClickListener(this);
-		btnListen.setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View view) {
-				startActivity(new Intent(BiblesOfflineActivity.this, Voice.class));
-				return true;
-			}
-		});
-		View btnZoomIn = findViewById(R.id.btnZoomIn);
-		btnZoomIn.setOnClickListener(this);
-//		btnZoomIn.setOnTouchListener(new View.OnTouchListener() {
-//			public boolean onTouch(View v, MotionEvent event) {
-//				final Handler handler = new Handler();
-//				if(event.getAction() == MotionEvent.ACTION_DOWN){
-//					//do something when pressed down
-//					handler.postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							// Do something after 5s = 5000ms
-//							currentFontSize++;
-//							displayBible(currentBibleFilename, currentChapterIdx);
-//						}
-//					}, 500);
-//					return false;
-//				}
-//				else if(event.getAction() == MotionEvent.ACTION_UP){
-//					//do something when let go
-//					//handler.cl
-//					return true;
-//				}
-//				return false;
-//			}
-//		});
-		View btnZoomOut = findViewById(R.id.btnZoomOut);
-		btnZoomOut.setOnClickListener(this);
-//		btnZoomOut.setOnTouchListener(new View.OnTouchListener() {
-//			public boolean onTouch(View v, MotionEvent event) {
-//				if(event.getAction() == MotionEvent.ACTION_DOWN){
-//					//do something when pressed down
-//					final Handler handler = new Handler();
-//					handler.postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							// Do something after 5s = 5000ms
-//							currentFontSize--;
-//							displayBible(currentBibleFilename, currentChapterIdx);
-//						}
-//					}, 500);
-//					return false;
-//				}
-//				else if(event.getAction() == MotionEvent.ACTION_UP){
-//					//do something when let go
-//
-//					return true;
-//				}
-//				return false;
-//			}
-//		});
-
-		TextView txtBibleName = (TextView) findViewById(R.id.txtBibleName);
-		txtBibleName.setOnClickListener(this);
-        txtBibleName.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                startActivity(new Intent(BiblesOfflineActivity.this, DownloadBible.class));
-                return true;
-            }
-        });
-
-		AlertDialog.Builder ad = new AlertDialog.Builder(this);
-		ad.setTitle(R.string.selectBibleVersion);
-		biblesAdapter = new ArrayAdapter<String>(this, R.layout.listitemmedium, bibleList);
-		viewBibles = new ListView(this);
-		viewBibles.setAdapter(biblesAdapter);
-		viewBibles.setOnItemClickListener(this);
-		ad.setView(viewBibles);
-		dialogBibles = ad.create();
-		dialogBibles.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
-		readPreference();
-		Util.copyAssetsFilesToSdCard(this);
-
-		LinearLayout bottomBar = (LinearLayout) findViewById(R.id.bottomBar);
-		if (isFullScreen) {
-			bottomBar.setVisibility(View.GONE);
-		} else {
-			bottomBar.setVisibility(View.VISIBLE);
-		}
-		applyParallel(isParallel);
-		
-		adapter = new DisplayVerseAdapter(this, R.layout.row, verseList, currentFontSize);
-		setListAdapter(adapter);
-		registerForContextMenu(getListView());
-		
-		txtEmpty2 = (TextView) findViewById(R.id.txtEmpty2);
-		ListView listviewParallel = (ListView) findViewById(R.id.listviewParallel);
-		parallelAdapter = new DisplayVerseAdapter(this, R.layout.row, verseParallelList, currentFontSize);
-	    listviewParallel.setAdapter(parallelAdapter);
-		listviewParallel.setEmptyView(txtEmpty2);
-
-		updateBibleFontSize();
-		updateBookLanguage();
-
-		//history dialog
-		ad = new AlertDialog.Builder(this);
-		ad.setTitle(R.string.history);
-		viewHistory = new ListView(this);
-		historyAdapter = new DisplayHistoryAdapter(this, R.layout.listitemmedium, historyList, currentBookLanguage);
-		viewHistory.setAdapter(historyAdapter);
-		viewHistory.setOnItemClickListener(this);
-		ad.setView(viewHistory);		
-		dialogHistory = ad.create();
-		dialogHistory.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-		if (!fromBookmarks && (savedInstanceState == null)) {
-			// Show the ProgressDialog on this thread		
-	        this.pd = ProgressDialog.show(this, getResources().getString(R.string.pleaseWait), getResources().getString(R.string.loading), true, false);
-	        if (txtEmpty != null) {
-	        	txtEmpty.setText(getResources().getString(R.string.no_bibles));
-	        }
-	        new LoadingTask().execute((Object)null);
-		} else {
-			List<String> bibles = databaseHelper.getBibleNameList();
-			populateBibleList(bibles);
-			displayBible(currentBibleFilename, currentChapterIdx);
-		}
-		
-		getListView().setOnScrollListener(new OnScrollListener() {
-			private boolean scroll = false;
-			
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				scroll = scrollState == SCROLL_STATE_FLING || scrollState == SCROLL_STATE_TOUCH_SCROLL;
-			}
-			
-			@Override
-			public void onScroll(AbsListView view, final int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {				
-				if (view.equals(getListView()) && isParallel && scroll) {
-					final ListView listviewParallel = (ListView) findViewById(R.id.listviewParallel);
-					listviewParallel.post(new Runnable(){
-						  public void run() {
-						    listviewParallel.setSelection(firstVisibleItem);
-						    listviewParallel.setSelected(false);
-						  }});
-				}
-			}
-		});
-		(new Sync(this)).execute();
-        //checkVoiceRecognition();
-		mGestureView = findViewById(R.id.linearList);
-		mScaleDetector = new ScaleGestureDetector(this, new MyPinchListener());
-		mGestureView.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				//inspect the event.
-				mScaleDetector.onTouchEvent(event);
-				return true;
-			}
-		});
-	}
-
-	class MyPinchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-		@Override
-		public boolean onScale(ScaleGestureDetector detector) {
-			Toast.makeText(BiblesOfflineActivity.this, "PINCHED", Toast.LENGTH_LONG).show();
-			Log.d("TAG", "PINCH! OUCH!");
-			return true;
-		}
-	}
-
 	private void populateBibleList(String[] arrBibles) {
 		List<String> bibles = new ArrayList<String>();
 		if (arrBibles != null) {
@@ -938,7 +882,7 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 	private void displayBible(String bibleFilename, int chapterIndex, boolean resetScroll) {
 		String state = Environment.getExternalStorageState();
 		if (!Environment.MEDIA_MOUNTED.equals(state)) {
-			txtEmpty.setText(getResources().getString(R.string.sdcard_error));
+			binding.txtEmpty.setText(getResources().getString(R.string.sdcard_error));
 			Toast.makeText(this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
 			return;
 		}
@@ -1022,26 +966,26 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 			
 			if (verseNotAvailable) {
 				if (chapterIndex < 929) {
-					txtEmpty.setText(getResources().getString(R.string.no_ot));
+					binding.txtEmpty.setText(getResources().getString(R.string.no_ot));
 				} else {
-					txtEmpty.setText(getResources().getString(R.string.no_nt));
+					binding.txtEmpty.setText(getResources().getString(R.string.no_nt));
 				}
 			}
 			
 			adapter.notifyDataSetChanged();
 			
 			if (fromBookmarks) {
-				getListView().post(new Runnable() {
+				binding.verseListView.post(new Runnable() {
 					@Override
-					public void run() {						
-						getListView().setSelection(bookmarkVerseStart-1);
+					public void run() {
+						binding.verseListView.setSelection(bookmarkVerseStart-1);
 					}
 				});
 			} else if (resetScroll) {
-				getListView().post(new Runnable() {
+				binding.verseListView.post(new Runnable() {
 					@Override
 					public void run() {
-						getListView().setSelection(0);
+						binding.verseListView.setSelection(0);
 					}
 				});
 			}
@@ -1137,9 +1081,9 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 				
 				if (verseNotAvailable) {
 					if (chapterIndex < 929) {
-						txtEmpty2.setText(getResources().getString(R.string.no_ot));
+						binding.txtEmpty2.setText(getResources().getString(R.string.no_ot));
 					} else {
-						txtEmpty2.setText(getResources().getString(R.string.no_nt));
+						binding.txtEmpty2.setText(getResources().getString(R.string.no_nt));
 					}
 				}
 				
@@ -1281,7 +1225,7 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					txtEmpty.setText(getResources().getString(R.string.sdcard_error));
+					binding.txtEmpty.setText(getResources().getString(R.string.sdcard_error));
 					Toast.makeText(BiblesOfflineActivity.this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
 				}
 			});
@@ -1485,12 +1429,6 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 		databaseHelper.deleteInvalidBible(fileNames);
 		return result;
 	}
-
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//	    if (keyCode ==KeyEvent.KEYCODE_MENU) openOptionsMenu();
-//        return true;
-//    }
 
     @Override
 	public void onClick(View v) {
@@ -1800,7 +1738,7 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 		} else if (gotoDownloadBible) {
 			gotoDownloadBible = false;
 			this.pd = ProgressDialog.show(this, getResources().getString(R.string.pleaseWait), getResources().getString(R.string.loading), true, false);
-			txtEmpty.setText(getResources().getString(R.string.no_bibles));
+			binding.txtEmpty.setText(getResources().getString(R.string.no_bibles));
 			new LoadingTask().execute((Object)null);
 		} else if (gotoBrowse) {
 			gotoBrowse = false;
@@ -1838,7 +1776,6 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 		}
 	}
 
-	
 	private void loadDefaultBookName() {
 		currentBookLanguage = LANG_ENGLISH;
 		Editor editor = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE).edit();
@@ -1857,7 +1794,6 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 		}
 	}
 	
-	// menu
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
@@ -1865,7 +1801,7 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 		inflater.inflate(R.menu.menu, menu);
 		return true;
 	}
-	
+
 	private void applyParallel(boolean isParallel) {
 		LinearLayout linearParallel = (LinearLayout) findViewById(R.id.linearParallel);
 		int height = 0;
@@ -1880,7 +1816,7 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);
 		linearParallel.setLayoutParams(params);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -2297,5 +2233,130 @@ public class BiblesOfflineActivity extends ListActivity implements OnClickListen
 //    void showToastErrorMessage(String message){
 //        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 //    }
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		int action = (event.getAction() & MotionEvent.ACTION_MASK);
+
+		switch (action) {
+			case MotionEvent.ACTION_POINTER_DOWN:
+			case MotionEvent.ACTION_DOWN:
+				mPtrCount++;
+				if (mPtrCount == 1 && mPrimStartTouchEventY == -1 && mPrimStartTouchEventY == -1) {
+					mPrimStartTouchEventX = event.getX(0);
+					mPrimStartTouchEventY = event.getY(0);
+                    Toast.makeText(this, String.format("POINTER ONE X = %.5f, Y = %.5f", mPrimStartTouchEventX, mPrimStartTouchEventY), Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", String.format("POINTER ONE X = %.5f, Y = %.5f", mPrimStartTouchEventX, mPrimStartTouchEventY));
+				}
+				if (mPtrCount == 2) {
+					// Starting distance between fingers
+					mSecStartTouchEventX = event.getX(1);
+					mSecStartTouchEventY = event.getY(1);
+					mPrimSecStartTouchDistance = distance(event, 0, 1);
+                    Toast.makeText(this, String.format("POINTER TWO X = %.5f, Y = %.5f", mSecStartTouchEventX, mSecStartTouchEventY), Toast.LENGTH_SHORT).show();
+					Log.d("TAG", String.format("POINTER TWO X = %.5f, Y = %.5f", mSecStartTouchEventX, mSecStartTouchEventY));
+				}
+
+				break;
+			case MotionEvent.ACTION_POINTER_UP:
+			case MotionEvent.ACTION_UP:
+				mPtrCount--;
+				if (mPtrCount < 2) {
+					mSecStartTouchEventX = -1;
+					mSecStartTouchEventY = -1;
+				}
+				if (mPtrCount < 1) {
+					mPrimStartTouchEventX = -1;
+					mPrimStartTouchEventY = -1;
+				}
+				break;
+
+			case MotionEvent.ACTION_MOVE:
+				boolean isPrimMoving = isScrollGesture(event, 0, mPrimStartTouchEventX, mPrimStartTouchEventY);
+				boolean isSecMoving = (mPtrCount > 1 && isScrollGesture(event, 1, mSecStartTouchEventX, mSecStartTouchEventY));
+
+				// There is a chance that the gesture may be a scroll
+				if (mPtrCount > 1 && isPinchGesture(event)) {
+                    Toast.makeText(this, "PINCH OUCH", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "PINCH! OUCH!");
+
+				} else if (isPrimMoving || isSecMoving) {
+					// A 1 finger or 2 finger scroll.
+					if (isPrimMoving && isSecMoving) {
+						Log.d("TAG", "Two finger scroll");
+					} else {
+						Log.d("TAG", "One finger scroll");
+					}
+				}
+				break;
+		}
+
+		return true;
+	}
+
+	private boolean isScrollGesture(MotionEvent event, int ptrIndex, float originalX, float originalY){
+		float moveX = Math.abs(event.getX(ptrIndex) - originalX);
+		float moveY = Math.abs(event.getY(ptrIndex) - originalY);
+
+		if (moveX > mViewScaledTouchSlop || moveY > mViewScaledTouchSlop) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isPinchGesture(MotionEvent event) {
+		if (event.getPointerCount() == 2) {
+			final float distanceCurrent = distance(event, 0, 1);
+			final float diffPrimX = mPrimStartTouchEventX - event.getX(0);
+			final float diffPrimY = mPrimStartTouchEventY - event.getY(0);
+			final float diffSecX = mSecStartTouchEventX - event.getX(1);
+			final float diffSecY = mSecStartTouchEventY - event.getY(1);
+
+			if (// if the distance between the two fingers has increased past
+				// our threshold
+					Math.abs(distanceCurrent - mPrimSecStartTouchDistance) > mViewScaledTouchSlop
+							// and the fingers are moving in opposing directions
+							&& (diffPrimY * diffSecY) <= 0
+							&& (diffPrimX * diffSecX) <= 0) {
+				// mPinchClamp = false; // don't clamp initially
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private float distance(MotionEvent event, int first, int second) {
+		if (event.getPointerCount() >= 2) {
+			final float x = event.getX(first) - event.getX(second);
+			final float y = event.getY(first) - event.getY(second);
+
+			return (float) Math.sqrt(x * x + y * y);
+		} else {
+			return 0;
+		}
+	}
+	class MyPinchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+		public MyPinchListener() {
+			super();
+		}
+
+		@Override
+		public boolean onScaleBegin(ScaleGestureDetector detector) {
+			return super.onScaleBegin(detector);
+		}
+
+		@Override
+		public void onScaleEnd(ScaleGestureDetector detector) {
+			super.onScaleEnd(detector);
+		}
+
+		@Override
+		public boolean onScale(ScaleGestureDetector detector) {
+			Toast.makeText(BiblesOfflineActivity.this, "PINCHED", Toast.LENGTH_LONG).show();
+			Log.d("TAG", "PINCH! OUCH!");
+			return true;
+		}
+	}
 
 }

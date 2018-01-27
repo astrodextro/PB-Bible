@@ -10,9 +10,22 @@ import android.widget.GridView;
 
 import com.felixunlimited.pbbible.models.Constants;
 import com.felixunlimited.pbbible.R;
+import android.widget.TextView;
+
+import com.felixunlimited.pbbible.R;
+import com.felixunlimited.pbbible.models.Constants;
 import com.felixunlimited.pbbible.ui.activities.BrowseBibleActivity;
 import com.felixunlimited.pbbible.ui.adapters.BrowseBibleAdapter;
 import com.felixunlimited.pbbible.utils.Util;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.GridView;
+
 
 public class BrowseChapterFragment extends Fragment {
     public BrowseChapterFragment() {
