@@ -6,6 +6,9 @@
     <string name="no_ot">This bible translation does not contain Old Testament</string>
     <string name="no_nt">This bible translation does not contain New Testament</string>
 
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
+
     <string name="kws_caption">To start demonstration say \"oh mighty computer\".</string>
     <string name="menu_caption">Say \"digits\", \"forecast\" or \"phones\" to choose the grammar, language model or phonetic decoder example.</string>
     <string name="digits_caption">To try recognition of digits: say something like \"one two three four five\".</string>
@@ -21,6 +24,7 @@
 
     <string name="about_label">About</string>
     <string name="exit_label">Exit</string>
+    <string name="pref_last_notification">last_notification</string>
 
     <string name="fontsize_label">Font Size</string>
     <string name="booklanguage_label">Book Name Language</string>

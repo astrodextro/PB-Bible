@@ -40,6 +40,7 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/about_title"
             android:theme="@style/AppBaseTheme.Dialog.Dark" />
+        <activity android:name=".ui.activities.BaseActivity" />
         <activity
             android:name=".ui.activities.AboutBibleActivity"
             android:configChanges="orientation|keyboardHidden"
