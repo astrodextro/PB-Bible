@@ -11,7 +11,7 @@
     </style>
 
     <!--No Title Bar Theme-->
-    <style name="AppBaseTheme.Dark.NoTitleBar" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+    <style name="AppBaseTheme.Dark.NoTitleBar" parent="Theme.Design.NoActionBar">
         <item name="android:popupMenuStyle">@null</item>
         <!--<item name="textBible">@style/text_dark</item>-->
     </style>

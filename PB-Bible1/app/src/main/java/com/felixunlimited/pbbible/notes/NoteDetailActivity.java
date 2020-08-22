@@ -2,7 +2,7 @@ package com.felixunlimited.pbbible.notes;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.felixunlimited.pbbible.R;
@@ -22,7 +22,7 @@ public class NoteDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_note_detail);
 
         // Show the Up button in the action bar.
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

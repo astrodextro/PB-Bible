@@ -10,9 +10,9 @@
 	<Spinner android:id="@+id/spnCategory" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" />
 	</LinearLayout>
-	<ListView android:id="@+id/android:list" android:layout_width="fill_parent"
+	<ListView android:id="@+id/list" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" />
-	<TextView android:id="@+id/android:empty"
+	<TextView android:id="@+id/empty"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
 		android:textSize="20sp"
 		android:text="@string/no_bookmarks" />
