@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#dd000000</color>
+    <color name="background_inverse">#dd000000</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <!-- brand color: orange -->
+    <!--<color name="colorPrimary">#FF9800</color>-->
+    <!--<color name="colorPrimaryDark">#F57C00</color>-->
+    <!--<color name="colorPrimaryLight">#FFE0B2</color>-->
+    <!--&lt;!&ndash; accent color: red &ndash;&gt;-->
+    <!--<color name="colorAccent">#FF5252</color>-->
+    <!--&lt;!&ndash; text color: white &ndash;&gt;-->
+    <!--<color name="textColorPrimary">#FFFFFF</color>-->
+    <!--<color name="textColorSecondary">#9E9E9E</color>-->
+    <!--&lt;!&ndash; inverse text color: 87% black &ndash;&gt;-->
+    <!--<color name="textColorPrimaryInverse">#DE000000</color>-->
+    <!--<color name="textColorSecondaryInverse">#9E9E9E</color>-->
+    <!--<color name="colorPrimaryInverse">...</color>-->
+    <!--<color name="colorPrimaryDarkInverse">...</color>-->
+    <!--<color name="colorAccentInverse">...</color>-->
+    <color name="colorPrimary">#125688</color>
+    <color name="colorPrimaryDark">#125688</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="navigationBarColor">#000000</color>
+    <color name="colorAccent">#c8e8ff</color>
+
+    <color name="black_overlay">#66000000</color>
+</resources>

@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.felixunlimited.pbbible.ui.activities.BaeActivity" >
+
+    <ListView
+        android:id="@+id/bae_scriptures_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+<!--
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You have a  Bae request from:"/>
+        <TextView
+            android:id="@+id/bae_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/bae_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ACCEPT"/>
+            <Button
+                android:id="@+id/bae_reject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REJECT" />
+        </LinearLayout>
+-->
+</RelativeLayout>

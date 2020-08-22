@@ -1,0 +1,17 @@
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/gradle
+/captures
+.externalNativeBuildgit
+/.idea/
+/wear/build
+/models/build
+/PB-Bible1
+/sphinxbase
+/pocketsphinx
+/pocketsphinx-android

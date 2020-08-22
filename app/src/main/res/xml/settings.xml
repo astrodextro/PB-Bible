@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<SwitchPreference
+		android:defaultValue="true"
+		android:key="@string/prefEnableNotificationKey"
+		android:title="@string/prefEnableNotificationTitle" />
+	<!--<ListPreference-->
+		<!--android:key="bookLanguage"-->
+		<!--android:title="@string/prefBookNameTitle"-->
+		<!--android:summary="@string/prefBookNameSummary"-->
+		<!--android:dialogTitle="@string/chooseLanguage" />-->
+		android:key="@string/prefColorSchemeKey"
+	<!--<ListPreference-->
+		<!--android:title="@string/prefColorSchemeTitle"-->
+		<!--android:entries="@array/prefColorSchemeLabels"-->
+		<!--android:entryValues="@array/prefColorSchemeValues"-->
+		<!--android:defaultValue="@string/prefColorSchemeDefault"-->
+		<!--android:summary="@string/prefColorSchemeSummary"-->
+		<!--android:dialogTitle="@string/prefColorSchemeSummary" />-->
+</PreferenceScreen>
