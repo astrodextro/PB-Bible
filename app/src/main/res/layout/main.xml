@@ -4,7 +4,12 @@
 
 	<data class="BibleOfflineBinding" />
 
-	<LinearLayout
+	<android.support.v4.widget.DrawerLayout
+		android:id="@+id/drawer_layout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<LinearLayout
 			android:id="@+id/content_view"
 			android:orientation="vertical"
 			android:baselineAligned="false"
@@ -146,4 +151,13 @@
 					android:background="@drawable/btnfooter_button"	 />
 			</LinearLayout>
 		</LinearLayout>
+		<android.support.design.widget.NavigationView
+			android:id="@+id/navigation"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_gravity="start"
+			android:fitsSystemWindows="true"
+			app:headerLayout="@layout/nav_header"
+			app:menu="@menu/menu"/>
+	</android.support.v4.widget.DrawerLayout>
 </layout>

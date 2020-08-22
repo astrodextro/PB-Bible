@@ -1,12 +1,14 @@
 package com.felixunlimited.pbbible.ui.activities;
 
 import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.databinding.DataBindingUtil;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -15,11 +17,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -78,11 +82,13 @@ import static com.felixunlimited.pbbible.models.Constants.BOOKMARK_VERSE_START;
 import static com.felixunlimited.pbbible.models.Constants.BOOKNAME_FOLDER;
 import static com.felixunlimited.pbbible.models.Constants.BOOK_LANGUAGE;
 import static com.felixunlimited.pbbible.models.Constants.CHAPTER_INDEX;
+import static com.felixunlimited.pbbible.models.Constants.CURRENT_BIBLE;
 import static com.felixunlimited.pbbible.models.Constants.DB_DATE_FORMAT;
 import static com.felixunlimited.pbbible.models.Constants.FONT_SIZE;
 import static com.felixunlimited.pbbible.models.Constants.FROM_BOOKMARKS;
 import static com.felixunlimited.pbbible.models.Constants.FROM_WIDGET;
 import static com.felixunlimited.pbbible.models.Constants.FULL_SCREEN;
+import static com.felixunlimited.pbbible.models.Constants.HELP_CONTENT;
 import static com.felixunlimited.pbbible.models.Constants.LANG_BAHASA;
 import static com.felixunlimited.pbbible.models.Constants.LANG_ENGLISH;
 import static com.felixunlimited.pbbible.models.Constants.PARALLEL;
@@ -102,7 +108,7 @@ import static com.felixunlimited.pbbible.models.Constants.arrBookStart;
 import static com.felixunlimited.pbbible.models.Constants.arrVerseCount;
 import static com.felixunlimited.pbbible.models.Constants.voiceFriendlyBookNames;
 
-public class BiblesOfflineActivity extends BaseActivity implements OnClickListener,
+public class BiblesOfflineActivity extends AppCompatActivity implements OnClickListener,
 		DialogInterface.OnClickListener,
 		OnItemClickListener, View.OnTouchListener {
 	private BibleOfflineBinding binding;
@@ -111,6 +117,16 @@ public class BiblesOfflineActivity extends BaseActivity implements OnClickListen
 
 	private DatabaseHelper databaseHelper;
 	private boolean isOpen = false;
+
+	//persist
+	private int currentChapterIdx;
+	private String currentBibleFilename;
+	private String currentBibleFilename2;
+	private String currentBookLanguage;
+	private int currentFontSize;
+	private boolean isFullScreen;
+	//not persist
+	private String currentBibleName;
 
 	private View footnoteView;
 	private View bookmarkView;	
@@ -159,7 +175,8 @@ public class BiblesOfflineActivity extends BaseActivity implements OnClickListen
     private AlertDialog dialogBibles;
 	private List<String> bibleList = new ArrayList<String>();
 	private ArrayAdapter<String> biblesAdapter;
-	
+
+	private boolean isParallel;
 
 	private int mPtrCount = 0;
 
@@ -172,6 +189,176 @@ public class BiblesOfflineActivity extends BaseActivity implements OnClickListen
 	private int mViewScaledTouchSlop = 0;
 
 	private ScaleGestureDetector mScaleDetector;
+
+//	@Override
+//	public void onItemCheckedStateChanged(ActionMode actionMode, int position, long id, boolean checked) {
+//		Menu menu = actionMode.getMenu();
+//		DisplayVerse verse = verseList.get(position);
+//		if (verse == null) return;
+//
+//		if (verse.isBookmark()) {
+//			menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.editBookmark);
+//			menu.add(Menu.NONE, Menu.FIRST+1, Menu.NONE, R.string.removeBookmark);
+//			menu.add(Menu.NONE, Menu.FIRST+3, Menu.NONE, R.string.copyToClipboard);
+//			menu.add(Menu.NONE, Menu.FIRST+5, Menu.NONE, R.string.share);
+//			menu.add(Menu.NONE, Menu.FIRST+7, Menu.NONE, R.string.highlight);
+//			menu.add(Menu.NONE, Menu.FIRST+9, Menu.NONE, R.string.send_to_bae);
+//			menu.add(Menu.NONE, Menu.FIRST+11, Menu.NONE, R.string.send_to_prayer_list);
+//		}
+//	}
+//
+//	@Override
+//	public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+//		MenuInflater inflater = actionMode.getMenuInflater();
+//		inflater.inflate(R.menu.cab_menu, menu);
+//		return true;
+//	}
+//
+//	@Override
+//	public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+//		return true;
+//	}
+//
+//	@Override
+//	public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+//		AdapterView.AdapterContextMenuInfo info;
+//		try {
+//			info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
+//		} catch (ClassCastException e) {
+//			Log.e(TAG, "bad menuInfo", e);
+//			return false;
+//		}
+//
+//		int index = info.position;
+//
+//		DisplayVerse verse = verseList.get(index);
+//		if (verse == null) return false;
+//		TextView txtVerse = (TextView) bookmarkView.findViewById(R.id.txtVerse);
+//
+//		switch (menuItem.getItemId()) {
+//			case Menu.FIRST: //edit Bookmark
+//				String[] arrBookChapter = Constants.arrVerseCount[currentChapterIdx].split(";");
+//				int book = Integer.parseInt(arrBookChapter[0]);
+//				int chapter = Integer.parseInt(arrBookChapter[1]);
+//				Bookmark bm = databaseHelper.getBookmark(book, chapter, verse.getVerseNumber());
+//				bookmarkVerseStart = bm.getVerseStart();
+//				bookmarkVerseEnd = bm.getVerseEnd();
+//				txtVerse.setTextSize(currentFontSize);
+//				StringBuffer sb = new StringBuffer();
+//				for (int j = bookmarkVerseStart; j <= bookmarkVerseEnd; j++) {
+//					DisplayVerse v = verseList.get(index + (j - bookmarkVerseStart));
+//					sb.append(SyncUtils.parseVerse(v.getVerse())).append(" ");
+//				}
+//				txtVerse.setText(sb.substring(0, sb.length() - 1));
+//				refreshBookNameOnBookmarkDialog();
+//				Spinner spnCategory = (Spinner) bookmarkView.findViewById(R.id.spnCategory);
+//				for (int i = 0; i < spnCategory.getAdapter().getCount(); i++) {
+//					String categoryName = (String) spnCategory.getAdapter().getItem(i);
+//					if (categoryName.equals(bm.getCategoryName())) {
+//						spnCategory.setSelection(i);
+//						break;
+//					}
+//				}
+//				bookmarkDialog.show();
+//				return true;
+//			case Menu.FIRST + 1: //remove Bookmark
+//				final int verseNumber = verse.getVerseNumber();
+//				new AlertDialog.Builder(this)
+//						.setTitle(R.string.removeBookmark)
+//						.setMessage(R.string.reallyRemoveBookmark)
+//						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+//							@Override
+//							public void onClick(DialogInterface dialog, int which) {
+//								String[] arrBookChapter = Constants.arrVerseCount[currentChapterIdx].split(";");
+//								int book = Integer.parseInt(arrBookChapter[0]);
+//								int chapter = Integer.parseInt(arrBookChapter[1]);
+//								databaseHelper.removeBookmark(book, chapter, verseNumber);
+//								displayBible(currentBibleFilename, currentChapterIdx, false);
+//							}
+//
+//						})
+//						.setNegativeButton(R.string.no, null)
+//						.show();
+//				return true;
+//			case Menu.FIRST + 2: //add Bookmark
+//				bookmarkVerseStart = verse.getVerseNumber();
+//				bookmarkVerseEnd = verse.getVerseNumber();
+//				txtVerse.setTextSize(currentFontSize);
+//				txtVerse.setText(SyncUtils.parseVerse(verse.getVerse()));
+//				refreshBookNameOnBookmarkDialog();
+//				bookmarkDialog.show();
+//				return true;
+//			case Menu.FIRST + 3: //copy bookmarked verse to clipboard
+//				copyOrShare = 'c';
+//				arrBookChapter = Constants.arrVerseCount[currentChapterIdx].split(";");
+//				book = Integer.parseInt(arrBookChapter[0]);
+//				chapter = Integer.parseInt(arrBookChapter[1]);
+//				bm = databaseHelper.getBookmark(book, chapter, verse.getVerseNumber());
+//				bookmarkVerseStart = bm.getVerseStart();
+//				bookmarkVerseEnd = bm.getVerseEnd();
+//				txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
+//				txtVerse.setTextSize(currentFontSize);
+//				sb = new StringBuffer();
+//				for (int j = bookmarkVerseStart; j <= bookmarkVerseEnd; j++) {
+//					DisplayVerse v = verseList.get(index + (j - bookmarkVerseStart));
+//					sb.append(SyncUtils.parseVerse(v.getVerse())).append(" ");
+//				}
+//				txtVerse.setText(sb.substring(0, sb.length() - 1));
+//				refreshBookNameOnCopyToClipboardDialog();
+//				copyToClipboardDialog.setTitle("Copy to clipboard");
+//				copyToClipboardDialog.show();
+//				return true;
+//			case Menu.FIRST + 4: //copy unbookmarked verse to clipboard
+//				copyOrShare = 'c';
+//				bookmarkVerseStart = verse.getVerseNumber();
+//				bookmarkVerseEnd = verse.getVerseNumber();
+//				txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
+//				txtVerse.setTextSize(currentFontSize);
+//				txtVerse.setText(SyncUtils.parseVerse(verse.getVerse()));
+//				refreshBookNameOnCopyToClipboardDialog();
+//				copyToClipboardDialog.setTitle("Copy to clipboard");
+//				copyToClipboardDialog.show();
+//				return true;
+//			case Menu.FIRST + 5: //share bookmarked
+//				copyOrShare = 's';
+//				arrBookChapter = Constants.arrVerseCount[currentChapterIdx].split(";");
+//				book = Integer.parseInt(arrBookChapter[0]);
+//				chapter = Integer.parseInt(arrBookChapter[1]);
+//				bm = databaseHelper.getBookmark(book, chapter, verse.getVerseNumber());
+//				bookmarkVerseStart = bm.getVerseStart();
+//				bookmarkVerseEnd = bm.getVerseEnd();
+//				txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
+//				txtVerse.setTextSize(currentFontSize);
+//				sb = new StringBuffer();
+//				for (int j = bookmarkVerseStart; j <= bookmarkVerseEnd; j++) {
+//					DisplayVerse v = verseList.get(index + (j - bookmarkVerseStart));
+//					sb.append(SyncUtils.parseVerse(v.getVerse())).append(" ");
+//				}
+//				txtVerse.setText(sb.substring(0, sb.length() - 1));
+//				refreshBookNameOnCopyToClipboardDialog();
+//				copyToClipboardDialog.setTitle("Share verse");
+//				copyToClipboardDialog.show();
+//				return true;
+//			case Menu.FIRST + 6: //share unbookmarked
+//				copyOrShare = 's';
+//				bookmarkVerseStart = verse.getVerseNumber();
+//				bookmarkVerseEnd = verse.getVerseNumber();
+//				txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
+//				txtVerse.setTextSize(currentFontSize);
+//				txtVerse.setText(SyncUtils.parseVerse(verse.getVerse()));
+//				refreshBookNameOnCopyToClipboardDialog();
+//				copyToClipboardDialog.setTitle("Share verse");
+//				copyToClipboardDialog.show();
+//				return true;
+//		}
+//		return true;
+//	}
+//
+//
+//	@Override
+//	public void onDestroyActionMode(ActionMode actionMode) {
+//		actionMode.finish();
+//	}
 
 	/** Called when the activity is first created. */
 	@Override
@@ -195,9 +382,9 @@ public class BiblesOfflineActivity extends BaseActivity implements OnClickListen
 		if (!Util.isMyServiceRunning(RandomMonthlyTheme.class, this))
 			startService(new Intent(this, RandomMonthlyTheme.class));
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		
-		binding = addContentView(R.layout.main);
-//		binding = DataBindingUtil.setContentView(this, R.layout.main);
+
+//		binding = new BibleOfflineBinding();
+		binding = DataBindingUtil.setContentView(this, R.layout.main);
 		bookmarkVerseStart = 1;
 		if (getIntent().getExtras() != null) {
 			this.fromBookmarks = getIntent().getExtras().getBoolean(FROM_BOOKMARKS, false);
@@ -672,6 +859,23 @@ public class BiblesOfflineActivity extends BaseActivity implements OnClickListen
   		title.setText(arrActiveBookName[book - 1] + " " + chapter);
 	}
 
+	private void readPreference() {
+		//SpeechRecognizer
+		SharedPreferences preference = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
+		currentChapterIdx = preference.getInt(CHAPTER_INDEX, 0);
+		if (currentChapterIdx < 0 || currentChapterIdx >= arrVerseCount.length) {
+			currentChapterIdx = 0;
+		}
+		currentBibleFilename = preference.getString(POSITION_BIBLE_NAME, "");
+		currentBibleFilename2 = preference.getString(POSITION_BIBLE_NAME_2, "");
+		currentFontSize = preference.getInt(FONT_SIZE, 18);
+		isFullScreen = preference.getBoolean(FULL_SCREEN, false);
+		isParallel = preference.getBoolean(PARALLEL, false);
+		
+		SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		currentBookLanguage = defaultPrefs.getString(BOOK_LANGUAGE, LANG_ENGLISH);
+	}
+	
 	private void displayBible(String bibleFilename, int chapterIndex) {
 		displayBible(bibleFilename, chapterIndex, true);
 	}
@@ -1591,6 +1795,14 @@ public class BiblesOfflineActivity extends BaseActivity implements OnClickListen
 		}
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+
 	private void applyParallel(boolean isParallel) {
 		LinearLayout linearParallel = (LinearLayout) findViewById(R.id.linearParallel);
 		int height = 0;
@@ -1604,6 +1816,104 @@ public class BiblesOfflineActivity extends BaseActivity implements OnClickListen
 		int width = getWindowManager().getDefaultDisplay().getWidth();
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);
 		linearParallel.setLayoutParams(params);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.parallel:
+				if (bibleList == null || bibleList.size() < 2) {
+					Toast.makeText(this, R.string.needMoreTranslation, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				isParallel = !isParallel;				
+				applyParallel(isParallel);
+				if (isParallel) {
+					displayBible(currentBibleFilename, currentChapterIdx);
+				}
+				updateBibleInfo();
+				if (isParallel && (currentBibleFilename2 == null || "".equals(currentBibleFilename2))) {
+					gotoSelectParallel = true;
+					startActivity(new Intent(this, SelectParallelBible.class));
+				}
+				return true;
+//			case R.id.contactAuthor:
+//				Intent i = new Intent(Intent.ACTION_SEND);
+//				i.setType("message/rfc822");
+//				i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"astrodextro@gmail.com"});
+//				i.putExtra(Intent.EXTRA_SUBJECT, "[OpenBibles] Question");
+//				i.putExtra(Intent.EXTRA_TEXT   , "");
+//			    startActivity(Intent.createChooser(i, "Send mail..."));
+//				return true;
+			case R.id.bookmark:
+				String state = Environment.getExternalStorageState();
+				if (!Environment.MEDIA_MOUNTED.equals(state)) {
+					Toast.makeText(this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				startActivity(new Intent(this, BookmarksActivity.class));
+				return true;
+			case R.id.find:
+				Intent find = new Intent(this, FindActivity.class);
+				find.putExtra(CURRENT_BIBLE, currentBibleName);
+				startActivity(find);
+				return true;
+			case R.id.about:
+				AlertDialog.Builder ad = new AlertDialog.Builder(this);
+				String[] arrImport = new String[] {"About " + currentBibleName, "About PB-Bible"};
+				ListView viewChooseAbout = new ListView(this);
+				ad.setView(viewChooseAbout);		
+				final AlertDialog dialogChooseAbout = ad.create();
+				dialogChooseAbout.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				viewChooseAbout.setAdapter(new ArrayAdapter<String>(this, R.layout.listitemmedium, arrImport));
+				viewChooseAbout.setOnItemClickListener(new OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						dialogChooseAbout.dismiss();
+						if (position==0) {
+							Intent i = new Intent(BiblesOfflineActivity.this, AboutBibleActivity.class);
+							i.putExtra(CURRENT_BIBLE, currentBibleName);
+							startActivity(i);
+						} else if (position==1) {
+							startActivity(new Intent(BiblesOfflineActivity.this, AboutActivity.class));
+						}
+					}
+				});
+				dialogChooseAbout.show();
+				return true;	
+			case R.id.download:
+				gotoDownloadBible = true;
+				startActivity(new Intent(this, DownloadBible.class));
+				return true;
+			case R.id.history:
+				dialogHistory.show();
+				return true;
+			case R.id.help:
+				Intent iHelp = new Intent(this, HelpActivity.class);
+				iHelp.putExtra(FONT_SIZE, currentFontSize);
+				iHelp.putExtra(HELP_CONTENT, R.string.help_main);
+				startActivity(iHelp);
+				return true;
+//			case R.id.document:
+////				state = Environment.getExternalStorageState();
+////				if (!Environment.MEDIA_MOUNTED.equals(state)) {
+////					Toast.makeText(this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
+////					return true;
+////				}
+////				startActivity(new Intent(this, DocumentsActivity.class));
+//				startActivity(new Intent(this, NoteListActivity.class));
+//				return true;
+			case R.id.settings:
+				gotoPrefs = true;
+				startActivity(new Intent(this, SettingsActivity.class));
+				//finish();
+				return true;
+//			case R.id.downloadBookname:
+//				gotoPrefs = true;
+//				startActivity(new Intent(this, DownloadBookname.class));
+//				return true;
+		}
+		return false;
 	}
 
 	private void refreshBookNameOnBookmarkDialog() {

@@ -73,5 +73,4 @@ public class BrowseChapterFragment extends Fragment {
             isResumed = false;
         return rootView;
     }
-
 }
