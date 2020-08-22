@@ -7,7 +7,7 @@
 /build
 /captures
 .externalNativeBuildgit
-/.idea/
+/.idea
 /wear/build
 /models/build
 /PB-Bible1
