@@ -4,18 +4,24 @@
 
 	<data class="BibleOfflineBinding" />
 
-	<androidx.drawerlayout.widget.DrawerLayout
+	<androidx.constraintlayout.widget.ConstraintLayout
 		android:id="@+id/drawer_layout"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent">
+		android:layout_height="match_parent"
+		>
 
 		<LinearLayout
 			android:id="@+id/content_view"
 			android:orientation="vertical"
 			android:baselineAligned="false"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:keepScreenOn="true">
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:keepScreenOn="true"
+			app:layout_constraintTop_toTopOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+			>
 
 			<LinearLayout
 				android:id="@+id/topBar"
@@ -86,9 +92,8 @@
 
 				<ListView
 					android:id="@+id/verse_list_view"
-					android:layout_width="0dp"
+					android:layout_width="wrap_content"
 					android:layout_height="fill_parent"
-					android:layout_weight="1"
 					android:divider="@null"
 					android:dividerHeight="0px" />
 
@@ -151,13 +156,15 @@
 					android:background="@drawable/btnfooter_button"	 />
 			</LinearLayout>
 		</LinearLayout>
-		<com.google.android.material.navigation.NavigationView
-			android:id="@+id/navigation"
-			android:layout_width="wrap_content"
-			android:layout_height="match_parent"
-			android:layout_gravity="start"
-			android:fitsSystemWindows="true"
-			app:headerLayout="@layout/nav_header"
-			app:menu="@menu/menu"/>
-	</androidx.drawerlayout.widget.DrawerLayout>
+
+		<com.google.android.material.bottomnavigation.BottomNavigationView
+			android:id="@+id/bottom_navigation"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			app:menu="@menu/bottom_navigation_menu"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			/>
+	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

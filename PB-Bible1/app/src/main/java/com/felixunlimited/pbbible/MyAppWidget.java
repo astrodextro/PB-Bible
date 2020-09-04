@@ -81,7 +81,7 @@ public class MyAppWidget extends AppWidgetProvider {
             	String filename = model.getBibleFileName();
             	String state = Environment.getExternalStorageState();
         		if (Environment.MEDIA_MOUNTED.equals(state)) {
-        			File sdcard = Environment.getExternalStorageDirectory();
+        			File sdcard = context.getFilesDir();
         			File file = new File(sdcard, Constants.BIBLE_FOLDER + "/" + filename);
         			String indexFileName = file.getAbsolutePath().replaceAll(".ont", ".idx");
         			File fIndex = new File(indexFileName);

@@ -381,7 +381,7 @@ public class ReadBibleActivity extends ListActivity implements OnClickListener, 
 			return;
 		}
 		
-		File sdcard = Environment.getExternalStorageDirectory();
+		File sdcard = getFilesDir();
 		
 		File file = new File(sdcard, Constants.BIBLE_FOLDER + "/" + bibleFilename);
 		String indexFileName = file.getAbsolutePath().replaceAll(".ont", ".idx");
@@ -959,7 +959,7 @@ public class ReadBibleActivity extends ListActivity implements OnClickListener, 
 	
 	private void loadVerseListWholeChapter(int chapterIndex) {
 		verseListWholeChapter.clear();
-		File sdcard = Environment.getExternalStorageDirectory();
+		File sdcard = getFilesDir();
 		File file = new File(sdcard, Constants.BIBLE_FOLDER + "/" + currentBibleFilename);
 		String indexFileName = file.getAbsolutePath().replaceAll(".ont", ".idx");
 		File fIndex = new File(indexFileName);

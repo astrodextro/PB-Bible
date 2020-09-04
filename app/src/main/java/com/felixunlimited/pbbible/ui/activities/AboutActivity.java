@@ -441,7 +441,7 @@ public class AboutActivity extends Activity {
 //			return;
 //		}
 //
-//		File sdcard = Environment.getExternalStorageDirectory();
+//		File sdcard = getFilesDir();
 //
 //		if (chapterIndex == -1) { //no bible available
 //			TextView current = (TextView) findViewById(R.id.txtCurrent);
@@ -677,7 +677,7 @@ public class AboutActivity extends Activity {
 //	private void readBibleBookName() {
 //		String state = Environment.getExternalStorageState();
 //		if (Environment.MEDIA_MOUNTED.equals(state)) {
-//			File sdcard = Environment.getExternalStorageDirectory();
+//			File sdcard = getFilesDir();
 //			File bookNameFolder = new File(sdcard.getPath() + Constants.BOOKNAME_FOLDER);
 //			if (!bookNameFolder.isDirectory()) {
 //				boolean success = bookNameFolder.mkdirs();
@@ -780,7 +780,7 @@ public class AboutActivity extends Activity {
 //			return null;
 //		}
 //
-//		File sdcard = Environment.getExternalStorageDirectory();
+//		File sdcard = getFilesDir();
 //		File bibleFolder = new File(sdcard.getPath() + Constants.BIBLE_FOLDER);
 //		List<BibleVersion> bibleList = databaseHelper.getAllBibleVersion();
 //		String[] result = null;
@@ -1217,7 +1217,7 @@ public class AboutActivity extends Activity {
 //			if (!defaultPrefs.getString(Constants.BOOK_LANGUAGE, Constants.LANG_ENGLISH).equals(currentBookLanguage)) {
 //				currentBookLanguage = defaultPrefs.getString(Constants.BOOK_LANGUAGE, Constants.LANG_ENGLISH);
 //
-//				File sdcard = Environment.getExternalStorageDirectory();
+//				File sdcard = getFilesDir();
 //				File bookNameFolder = new File(sdcard.getPath() + Constants.BOOKNAME_FOLDER);
 //				File bookNameFile = new File(bookNameFolder, currentBookLanguage + ".bkn");
 //				if (bookNameFile.isFile()) {

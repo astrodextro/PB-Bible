@@ -64,7 +64,7 @@ public class DownloadBookname extends ListActivity implements OnItemClickListene
 		
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {		
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File booknameFolder = new File(sdcard.getPath() + Constants.BOOKNAME_FOLDER);
 			if (!booknameFolder.isDirectory()) {
 				boolean success = booknameFolder.mkdirs();			
@@ -188,7 +188,7 @@ public class DownloadBookname extends ListActivity implements OnItemClickListene
 			return;
 		}
 		
-		File sdcard = Environment.getExternalStorageDirectory();
+		File sdcard = getFilesDir();
 		StringBuffer destFileName = new StringBuffer(sdcard.getPath());
 		destFileName.append(Constants.BOOKNAME_FOLDER).append("/").append(downloadFilename);
 		File f = new File(destFileName.toString());
@@ -240,7 +240,7 @@ public class DownloadBookname extends ListActivity implements OnItemClickListene
 	private class DownloadTask extends AsyncTask<Object, Void, Object> {		
 		@Override
 		protected Object doInBackground(Object... arg) {
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			StringBuffer destFileName = new StringBuffer(sdcard.getPath());
 			destFileName.append(Constants.BOOKNAME_FOLDER).append("/").append(downloadFilename);
 			

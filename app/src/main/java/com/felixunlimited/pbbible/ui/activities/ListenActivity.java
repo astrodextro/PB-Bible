@@ -555,7 +555,7 @@ public class ListenActivity extends Activity implements AdapterView.OnItemSelect
             return;
         }
 
-        File sdcard = Environment.getExternalStorageDirectory();
+        File sdcard = getFilesDir();
 
         if (chapterIndex == -1) { //no bible available
             TextView current = (TextView) findViewById(R.id.txtCurrent);

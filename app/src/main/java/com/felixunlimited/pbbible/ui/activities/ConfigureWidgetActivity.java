@@ -43,7 +43,7 @@ public class ConfigureWidgetActivity extends Activity implements OnClickListener
 		
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File bookNameFolder = new File(sdcard.getPath() + Constants.BOOKNAME_FOLDER);
 			if (!bookNameFolder.isDirectory()) {
 				return;

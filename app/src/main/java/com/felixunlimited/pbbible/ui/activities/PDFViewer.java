@@ -291,7 +291,7 @@ public class PDFViewer extends AppCompatActivity {
         // Get filename
         final String filename = pdfUrl.substring( pdfUrl.lastIndexOf( "/" ) + 1 );
         // The place where the downloaded PDF file will be put
-        final File tempFile = new File( Environment.getExternalStorageDirectory(), Constants.DOWNLOAD_FOLDER + filename );
+        final File tempFile = new File( context.getFilesDir(), Constants.DOWNLOAD_FOLDER + filename );
         if ( tempFile.exists() ) {
             // If we have downloaded the file before, just go ahead and show it.
             openPDF( context, Uri.fromFile( tempFile ) );
@@ -311,7 +311,7 @@ public class PDFViewer extends AppCompatActivity {
 
         // Create the download request
         DownloadManager.Request r = new DownloadManager.Request( Uri.parse( pdfUrl ) );
-//        r.setDestinationInExternalPublicDir(null, Environment.getExternalStorageDirectory().getAbsolutePath()+Constants.NOTES_FOLDER);
+//        r.setDestinationInExternalPublicDir(null, getFilesDir().getAbsolutePath()+Constants.NOTES_FOLDER);
         r.setDestinationInExternalFilesDir( context, Environment.DIRECTORY_DOWNLOADS, filename );
         final DownloadManager dm = (DownloadManager) context.getSystemService( Context.DOWNLOAD_SERVICE );
         BroadcastReceiver onComplete = new BroadcastReceiver() {

@@ -115,7 +115,7 @@ public class DownloadBible extends ListActivity implements OnItemClickListener, 
 		
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {		
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File downloadFolder = new File(sdcard.getPath() + Constants.DOWNLOAD_FOLDER);
 			if (!downloadFolder.isDirectory()) {
 				boolean success = downloadFolder.mkdirs();			
@@ -264,7 +264,7 @@ public class DownloadBible extends ListActivity implements OnItemClickListener, 
 	private class DownloadTask extends AsyncTask<Object, Void, Object> {		
 		@Override
 		protected Object doInBackground(Object... arg) {
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			StringBuffer destFileName = new StringBuffer(sdcard.getPath());
 			destFileName.append(Constants.DOWNLOAD_FOLDER).append("/").append(downloadFileName.toLowerCase()).append(".zip");
 			StringBuffer extractedFileName = new StringBuffer(sdcard.getPath());
@@ -523,7 +523,7 @@ public class DownloadBible extends ListActivity implements OnItemClickListener, 
 			return;
 		}
 		
-		File sdcard = Environment.getExternalStorageDirectory();
+		File sdcard = getFilesDir();
 		StringBuffer destFileName = new StringBuffer(sdcard.getPath());
 		destFileName.append(Constants.BIBLE_FOLDER).append("/").append(downloadFileName.toLowerCase()).append(".ont");
 		File f = new File(destFileName.toString());

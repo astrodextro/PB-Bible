@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/parallel"
+        android:enabled="true"
+        android:title="@string/parallelMode"
+        android:icon="@drawable/menu_parallel"
+        />
+    <item android:id="@+id/find"
+        android:enabled="true"
+        android:title="@string/find"
+        android:icon="@drawable/menu_find"
+        />
+    <item android:id="@+id/settings"
+        android:enabled="true"
+        android:title="@string/settings"
+        android:icon="@drawable/menu_settings"
+        />
+    <item android:id="@+id/download"
+        android:enabled="true"
+        android:title="@string/downloadBible"
+        android:icon="@drawable/menu_import"
+        />
+<!--    <item android:id="@+id/bookmark"-->
+<!--        android:enabled="true"-->
+<!--        android:title="@string/bookmarks_label"-->
+<!--        android:icon="@drawable/menu_bookmark"-->
+<!--        />-->
+<!--    <item android:id="@+id/history"-->
+<!--        android:enabled="true"-->
+<!--        android:title="@string/history"-->
+<!--        android:icon="@drawable/menu_history"-->
+<!--        />-->
+    <item android:id="@+id/about"
+        android:enabled="true"
+        android:title="@string/about_label"
+        android:icon="@drawable/menu_about"
+        />
+<!--    <item android:id="@+id/help"-->
+<!--        android:enabled="true"-->
+<!--        android:title="@string/help"-->
+<!--        android:icon="@drawable/menu_help"-->
+<!--        />-->
+</menu>

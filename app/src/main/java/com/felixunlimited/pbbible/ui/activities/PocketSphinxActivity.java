@@ -96,7 +96,7 @@
 //                try {
 //                    Assets assets = new Assets(PocketSphinxActivity.this);
 //                    File assetDir = assets.syncAssets();
-//                    //convertFileToLowerCase(new File(Environment.getExternalStorageDirectory(), "4415.dic"));
+//                    //convertFileToLowerCase(new File(getFilesDir(), "4415.dic"));
 //                    setupRecognizer(assetDir);
 //                } catch (IOException e) {
 //                    return e;

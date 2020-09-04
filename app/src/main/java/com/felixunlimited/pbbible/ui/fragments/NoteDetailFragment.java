@@ -197,7 +197,7 @@ public class NoteDetailFragment extends Fragment{
     }
 
     public void newNote() {
-        mNote = new Note(getContext());
+        mNote = new Note();
         if (getArguments().getString(NotePadUtils.ARG_SCRIPTURE) != null) {
             mNote.content += getArguments().getString(NotePadUtils.ARG_SCRIPTURE);
         }

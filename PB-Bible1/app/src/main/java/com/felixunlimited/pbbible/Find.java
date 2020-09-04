@@ -209,7 +209,7 @@ public class Find extends ListActivity implements OnClickListener, OnItemClickLi
 		@Override
 		protected Object doInBackground(Object... arg) {
 			BibleVersion bible = databaseHelper.getBibleVersionByBibleName(bibleName);
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File file = new File(sdcard, Constants.BIBLE_FOLDER + "/" + bible.getFileName());
 			bibleFileName = bible.getFileName();
 			

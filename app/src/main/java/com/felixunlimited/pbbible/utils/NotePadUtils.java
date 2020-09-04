@@ -78,7 +78,7 @@ public class NotePadUtils {
         }
         else {
             noteFile = new File(NOTES_DIR, String.valueOf(System.currentTimeMillis()) + ".nt");
-            note = new Note(context);
+            note = new Note();
             note.title = dateToday;
         }
 

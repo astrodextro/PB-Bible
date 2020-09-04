@@ -90,7 +90,7 @@ public class Bookmarks extends ListActivity implements OnClickListener, OnItemSe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.bookmarks);
 		
-		File sdcard = Environment.getExternalStorageDirectory();
+		File sdcard = getFilesDir();
 		File bookmarkFolder = new File(sdcard.getPath() + Constants.BOOKMARK_FOLDER);
 		if (!bookmarkFolder.isDirectory()) {
 			boolean success = bookmarkFolder.mkdirs();
@@ -329,7 +329,7 @@ public class Bookmarks extends ListActivity implements OnClickListener, OnItemSe
 		protected Integer doInBackground(Object... arg) {
 			String filename = (String) arg[0];
 			filename = filename + ".bmk";
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File f = new File(sdcard.getPath() + Constants.BOOKMARK_FOLDER + "/" + filename);
 			
 			BufferedReader br = null;
@@ -435,7 +435,7 @@ public class Bookmarks extends ListActivity implements OnClickListener, OnItemSe
 		@Override
 		protected Integer doInBackground(Object... arg) {
 			String filename = (String) arg[0];
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			int posDot = filename.indexOf(".");
 			if (posDot > -1) {
 				filename = filename.substring(0, posDot);
@@ -524,7 +524,7 @@ public class Bookmarks extends ListActivity implements OnClickListener, OnItemSe
 		} else if (parent == viewImportFrom) {
 			dialogImportFrom.dismiss();
 			if (position == 0) { //sdcard			
-				File sdcard = Environment.getExternalStorageDirectory();
+				File sdcard = getFilesDir();
 				File bookmarkFolder = new File(sdcard.getPath() + Constants.BOOKMARK_FOLDER);
 				File[] arrFile = bookmarkFolder.listFiles(new FileFilter() {
 					@Override

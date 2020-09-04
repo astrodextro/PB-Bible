@@ -1,5 +1,6 @@
 package com.felixunlimited.pbbible.ui.activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -7,7 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import android.media.AudioManager;
 import android.os.AsyncTask;
@@ -56,6 +62,8 @@ import com.felixunlimited.pbbible.ui.adapters.DisplayHistoryAdapter;
 import com.felixunlimited.pbbible.ui.adapters.DisplayVerseAdapter;
 import com.felixunlimited.pbbible.utils.NotePadUtils;
 import com.felixunlimited.pbbible.utils.Util;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,7 +118,7 @@ import static com.felixunlimited.pbbible.models.Constants.voiceFriendlyBookNames
 
 public class BiblesOfflineActivity extends AppCompatActivity implements OnClickListener,
 		DialogInterface.OnClickListener,
-		OnItemClickListener, View.OnTouchListener {
+		OnItemClickListener, View.OnTouchListener, BottomNavigationView.OnNavigationItemReselectedListener, BottomNavigationView.OnNavigationItemSelectedListener {
 	private BibleOfflineBinding binding;
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
     private static final String TAG = "BiblesOfflineActivity";
@@ -129,7 +137,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 	private String currentBibleName;
 
 	private View footnoteView;
-	private View bookmarkView;	
+	private View bookmarkView;
 	private View copyToClipboardView;
 	private AlertDialog footnoteDialog;
 	private AlertDialog bookmarkDialog;
@@ -137,7 +145,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 	private AlertDialog copyToClipboardDialog;
 
 	private char copyOrShare; //'c' or 's' or 'b' or 'n' or 'p'
-	
+
 	private ProgressDialog pd = null;
 	private ListView viewBibles;
 	private ListView viewHistory;
@@ -148,26 +156,26 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 	public AlertDialog getFootnoteDialog() {
 		return footnoteDialog;
 	}
-	
+
 	private Handler handler = new Handler();
 	private List<DisplayVerse> verseList = new ArrayList<DisplayVerse>();
 	private DisplayVerseAdapter adapter;
-	
+
 	private List<DisplayVerse> verseParallelList = new ArrayList<DisplayVerse>();
 	private DisplayVerseAdapter parallelAdapter;
-	
+
 	private boolean fromBookmarks;
 	private int bookmarkVerseStart;
 	private int bookmarkVerseEnd;
 	private int bookmarkVerseMax;
-	
+
 	private boolean gotoDownloadBible = false;
 	private boolean gotoBrowse = false;
 	private boolean gotoSelectParallel = false;
 	private boolean gotoPrefs = false;
 	private boolean gotoDocuments = false;
 	private int lastChapterIdx = 0;
-	
+
 	private AlertDialog dialogHistory;
 	private List<Integer> historyList = new ArrayList<Integer>();
 	private DisplayHistoryAdapter historyAdapter;
@@ -613,6 +621,35 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 //				return true;
 //			}
 //		});
+		binding.bottomNavigation.setOnNavigationItemSelectedListener(this);
+		requestForPermission();
+	}
+
+	public final String[] EXTERNAL_PERMS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+	};
+
+	public final int EXTERNAL_REQUEST = 138;
+	public boolean requestForPermission() {
+
+		boolean isPermissionOn = true;
+		final int version = Build.VERSION.SDK_INT;
+		if (version >= 23) {
+			if (!canAccessExternalSd()) {
+				isPermissionOn = false;
+				requestPermissions(EXTERNAL_PERMS, EXTERNAL_REQUEST);
+			}
+		}
+
+		return isPermissionOn;
+	}
+
+	public boolean canAccessExternalSd() {
+		return (hasPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE));
+	}
+
+	private boolean hasPermission(String perm) {
+		return (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, perm));
+
 	}
 
 	@Override
@@ -638,7 +675,6 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		menu.add(Menu.NONE, Menu.FIRST+5, Menu.NONE, R.string.highlight).setVisible(false);
 		menu.add(Menu.NONE, Menu.FIRST+6, Menu.NONE, R.string.send_to_bae).setVisible(false);
 		menu.add(Menu.NONE, Menu.FIRST+7, Menu.NONE, R.string.send_to_note).setVisible(false);
-
 	}
 
 	@Override
@@ -788,6 +824,109 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 	    if (pd != null) pd.dismiss();
     }
 
+	@Override
+	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.parallel:
+				if (bibleList == null || bibleList.size() < 2) {
+					Toast.makeText(this, R.string.needMoreTranslation, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				isParallel = !isParallel;
+				applyParallel(isParallel);
+				if (isParallel) {
+					displayBible(currentBibleFilename, currentChapterIdx);
+				}
+				updateBibleInfo();
+				if (isParallel && (currentBibleFilename2 == null || "".equals(currentBibleFilename2))) {
+					gotoSelectParallel = true;
+					startActivity(new Intent(this, SelectParallelBible.class));
+				}
+				return true;
+//			case R.id.contactAuthor:
+//				Intent i = new Intent(Intent.ACTION_SEND);
+//				i.setType("message/rfc822");
+//				i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"astrodextro@gmail.com"});
+//				i.putExtra(Intent.EXTRA_SUBJECT, "[OpenBibles] Question");
+//				i.putExtra(Intent.EXTRA_TEXT   , "");
+//			    startActivity(Intent.createChooser(i, "Send mail..."));
+//				return true;
+			case R.id.bookmark:
+				String state = Environment.getExternalStorageState();
+				if (!Environment.MEDIA_MOUNTED.equals(state)) {
+					Toast.makeText(this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
+					return true;
+				}
+				startActivity(new Intent(this, BookmarksActivity.class));
+				return true;
+			case R.id.find:
+				Intent find = new Intent(this, FindActivity.class);
+				find.putExtra(CURRENT_BIBLE, currentBibleName);
+				startActivity(find);
+				return true;
+			case R.id.about:
+				AlertDialog.Builder ad = new AlertDialog.Builder(this);
+				String[] arrImport = new String[] {"About " + currentBibleName, "About PB-Bible"};
+				ListView viewChooseAbout = new ListView(this);
+				ad.setView(viewChooseAbout);
+				final AlertDialog dialogChooseAbout = ad.create();
+				dialogChooseAbout.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				viewChooseAbout.setAdapter(new ArrayAdapter<String>(this, R.layout.listitemmedium, arrImport));
+				viewChooseAbout.setOnItemClickListener(new OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						dialogChooseAbout.dismiss();
+						if (position==0) {
+							Intent i = new Intent(BiblesOfflineActivity.this, AboutBibleActivity.class);
+							i.putExtra(CURRENT_BIBLE, currentBibleName);
+							startActivity(i);
+						} else if (position==1) {
+							startActivity(new Intent(BiblesOfflineActivity.this, AboutActivity.class));
+						}
+					}
+				});
+				dialogChooseAbout.show();
+				return true;
+			case R.id.download:
+				gotoDownloadBible = true;
+				startActivity(new Intent(this, DownloadBible.class));
+				return true;
+			case R.id.history:
+				dialogHistory.show();
+				return true;
+			case R.id.help:
+				Intent iHelp = new Intent(this, HelpActivity.class);
+				iHelp.putExtra(FONT_SIZE, currentFontSize);
+				iHelp.putExtra(HELP_CONTENT, R.string.help_main);
+				startActivity(iHelp);
+				return true;
+//			case R.id.document:
+////				state = Environment.getExternalStorageState();
+////				if (!Environment.MEDIA_MOUNTED.equals(state)) {
+////					Toast.makeText(this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
+////					return true;
+////				}
+////				startActivity(new Intent(this, DocumentsActivity.class));
+//				startActivity(new Intent(this, NoteListActivity.class));
+//				return true;
+			case R.id.settings:
+				gotoPrefs = true;
+				startActivity(new Intent(this, SettingsActivity.class));
+				//finish();
+				return true;
+//			case R.id.downloadBookname:
+//				gotoPrefs = true;
+//				startActivity(new Intent(this, DownloadBookname.class));
+//				return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void onNavigationItemReselected(@NonNull MenuItem item) {
+
+	}
+
 	private class LoadingTask extends AsyncTask<Object, Void, Object> {
 		@Override
 		protected Object doInBackground(Object... arg) {
@@ -796,7 +935,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			populateBibleList(arrBibles);
 			return null;
 		}
-		
+
 		@Override
 		protected void onPostExecute(Object result) {
 			if (pd != null) {
@@ -813,9 +952,9 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		}
 		populateBibleList(bibles);
 	}
-	
+
 	private void populateBibleList(List<String> bibles) {
-		bibleList.clear();		
+		bibleList.clear();
 		for (String bible : bibles) {
 			bibleList.add(bible);
 		}
@@ -823,9 +962,9 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		if (bibles.size() == 0) return;
 		BibleVersion bibleVersion;
 		if (currentBibleFilename == null || currentBibleFilename.equals("")) {
-			bibleVersion = databaseHelper.getBibleVersionByBibleName(bibles.get(0));				
+			bibleVersion = databaseHelper.getBibleVersionByBibleName(bibles.get(0));
 		} else {
-			bibleVersion = databaseHelper.getBibleVersionByFileName(currentBibleFilename);				
+			bibleVersion = databaseHelper.getBibleVersionByFileName(currentBibleFilename);
 			if (bibleVersion == null) {
 				bibleVersion = databaseHelper.getBibleVersionByBibleName(bibles.get(0));
 			}
@@ -839,23 +978,23 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			}
 		});
 	}
-	
+
 	private void updateBibleFontSize() {
 		adapter.updateFontSize(currentFontSize);
 		adapter.notifyDataSetChanged();
 		parallelAdapter.updateFontSize(currentFontSize);
 		parallelAdapter.notifyDataSetChanged();
-		
+
 		TextView txtFootnote = (TextView) footnoteView.findViewById(R.id.txtFootnote);
 		txtFootnote.setTextSize(currentFontSize);
 	}
-	
+
 	private void updateBookLanguage() {
 		TextView title = (TextView) findViewById(R.id.txtCurrent);
 		String[] arrBookChapter = arrVerseCount[currentChapterIdx].split(";");
   		int book = Integer.parseInt(arrBookChapter[0]);
   		int chapter = Integer.parseInt(arrBookChapter[1]);
-		
+
   		title.setText(arrActiveBookName[book - 1] + " " + chapter);
 	}
 
@@ -871,11 +1010,11 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		currentFontSize = preference.getInt(FONT_SIZE, 18);
 		isFullScreen = preference.getBoolean(FULL_SCREEN, false);
 		isParallel = preference.getBoolean(PARALLEL, false);
-		
+
 		SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		currentBookLanguage = defaultPrefs.getString(BOOK_LANGUAGE, LANG_ENGLISH);
 	}
-	
+
 	private void displayBible(String bibleFilename, int chapterIndex) {
 		displayBible(bibleFilename, chapterIndex, true);
 	}
@@ -887,19 +1026,19 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			Toast.makeText(this, R.string.sdcardNotReady, Toast.LENGTH_LONG).show();
 			return;
 		}
-		
-		File sdcard = Environment.getExternalStorageDirectory();
-		
+
+		File sdcard = getFilesDir();
+
 		if (chapterIndex == -1) { //no bible available
 			TextView current = (TextView) findViewById(R.id.txtCurrent);
 			current.setText("Error");
 			return;
 		}
-		
+
 		File file = new File(sdcard, BIBLE_FOLDER + "/" + bibleFilename);
 		String indexFileName = file.getAbsolutePath().replaceAll(".ont", ".idx");
 		File fIndex = new File(indexFileName);
-		
+
 		String[] arrBookChapter = arrVerseCount[chapterIndex]
 				.split(";");
 		int verseCount = Integer.parseInt(arrBookChapter[2]);
@@ -912,10 +1051,10 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		BufferedReader br = null;
 		try {
 			DataInputStream is = new DataInputStream(new FileInputStream(fIndex));
-			is.skip(chapterIndex*4);			
+			is.skip(chapterIndex*4);
 			int startOffset = is.readInt();
 			is.close();
-			
+
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"), 8192);
 			br.skip(startOffset);
 			String line = "";
@@ -928,7 +1067,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 					continue;
 				}
 				boolean breakParagraph = false;
-				
+
 				line = line.replaceAll("<CL>", "\n");
 				int posCM = line.indexOf("<CM>");
 				if (posCM > -1) {
@@ -943,11 +1082,11 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 						line = line.substring(0, line.length()-"<CM>".length());
 					}
 				}
-				
+
 				line = line.replaceAll("<CM>", "\n\n");
 				line = line.replaceAll("\n\n \n\n", "\n\n");
 				line = line.replaceAll("\n\n\n\n", "\n\n");
-				
+
 				boolean bookmarked = false;
 				int highlighted = 0;
 				if (!highlighedList.isEmpty())
@@ -955,7 +1094,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 				if (bookmarkList.contains(Integer.valueOf(i))) {
 					bookmarked = true;
 				}
-				
+
 				if (prevBreakParagraph) {
 					verseList.add(new DisplayVerse(i, line, bookmarked, highlighted, true));
 				} else {
@@ -964,7 +1103,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 				prevBreakParagraph = breakParagraph;
 				verseNotAvailable = false;
 			}
-			
+
 			if (verseNotAvailable) {
 				if (chapterIndex < 929) {
 					binding.txtEmpty.setText(getResources().getString(R.string.no_ot));
@@ -972,9 +1111,9 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 					binding.txtEmpty.setText(getResources().getString(R.string.no_nt));
 				}
 			}
-			
+
 			adapter.notifyDataSetChanged();
-			
+
 			if (fromBookmarks) {
 				binding.verseListView.post(new Runnable() {
 					@Override
@@ -990,7 +1129,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 					}
 				});
 			}
-			
+
 			//update history
 			boolean alreadyInHistory = false;
 			for (int i=0; i < historyList.size(); i++) {
@@ -1009,10 +1148,10 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 				historyList.set(0, chapterIndex);
 				historyAdapter.notifyDataSetChanged();
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {			
+		} finally {
 			if (br != null) {
 				try {
 					br.close();
@@ -1021,21 +1160,21 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 				}
 			}
 		}
-		
+
 		//added parallel
 		if (isParallel && currentBibleFilename2 != null && !"".equals(currentBibleFilename2)) {
 			file = new File(sdcard, BIBLE_FOLDER + "/" + currentBibleFilename2);
 			indexFileName = file.getAbsolutePath().replaceAll(".ont", ".idx");
 			fIndex = new File(indexFileName);
-			
+
 			verseParallelList.clear();
 			br = null;
 			try {
 				DataInputStream is = new DataInputStream(new FileInputStream(fIndex));
-				is.skip(chapterIndex*4);			
+				is.skip(chapterIndex*4);
 				int startOffset = is.readInt();
 				is.close();
-				
+
 				br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"), 8192);
 				br.skip(startOffset);
 				String line = "";
@@ -1048,7 +1187,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 						continue;
 					}
 					boolean breakParagraph = false;
-					
+
 					line = line.replaceAll("<CL>", "\n");
 					int posCM = line.indexOf("<CM>");
 					if (posCM > -1) {
@@ -1063,14 +1202,14 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 							line = line.substring(0, line.length()-"<CM>".length());
 						}
 					}
-					
+
 					line = line.replaceAll("<CM>", "\n\n");
 					line = line.replaceAll("\n\n \n\n", "\n\n");
 					line = line.replaceAll("\n\n\n\n", "\n\n");
-					
+
 					boolean bookmarked = false;
 					int highlight = 0;
-					
+
 					if (prevBreakParagraph) {
 						verseParallelList.add(new DisplayVerse(i, line, bookmarked, highlight, true));
 					} else {
@@ -1079,7 +1218,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 					prevBreakParagraph = breakParagraph;
 					verseNotAvailable = false;
 				}
-				
+
 				if (verseNotAvailable) {
 					if (chapterIndex < 929) {
 						binding.txtEmpty2.setText(getResources().getString(R.string.no_ot));
@@ -1087,14 +1226,14 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 						binding.txtEmpty2.setText(getResources().getString(R.string.no_nt));
 					}
 				}
-				
+
 				parallelAdapter.notifyDataSetChanged();
-				
-				final ListView listviewParallel = (ListView) findViewById(R.id.listviewParallel);			
+
+				final ListView listviewParallel = (ListView) findViewById(R.id.listviewParallel);
 				if (fromBookmarks) {
 					listviewParallel.post(new Runnable() {
 						@Override
-						public void run() {						
+						public void run() {
 							listviewParallel.setSelection(bookmarkVerseStart-1);
 						}
 					});
@@ -1118,74 +1257,71 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 				}
 			}
 		}
-		
+
 		updateBookLanguage();
-		
+
 		if (fromBookmarks) {
 			fromBookmarks = false;
 		}
 		saveBookNumber();
 	}
-	
+
 	private void readBibleBookName() {
-		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			File sdcard = Environment.getExternalStorageDirectory();
-			File bookNameFolder = new File(sdcard.getPath() + BOOKNAME_FOLDER);
-			if (!bookNameFolder.isDirectory()) {
-				boolean success = bookNameFolder.mkdirs();
-				if (!success) {
-					return;
+		File sdcard = getFilesDir();
+		File bookNameFolder = new File(sdcard.getPath() + BOOKNAME_FOLDER);
+		if (!bookNameFolder.isDirectory()) {
+			boolean success = bookNameFolder.mkdirs();
+			if (!success) {
+				return;
+			}
+		}
+		File[] bookNameFiles = bookNameFolder.listFiles();
+		if (bookNameFiles.length == 0) {
+			try {
+				File fEnglish = new File(bookNameFolder, LANG_ENGLISH + ".bkn");
+				PrintWriter outEnglish = new PrintWriter(fEnglish, "UTF-8");
+				for (String bookName : arrBookName) {
+					String str = bookName;
+					if ("Judges".equals(bookName)) {
+						str = str + ";;Judg";
+					} else if ("Jude".equals(bookName)) {
+						str = str + ";;Jude";
+					} else if ("John".equals(bookName)) {
+						str = str + ";;Jn";
+					} else if ("1 John".equals(bookName)) {
+						str = str + ";;1 Jn";
+					} else if ("2 John".equals(bookName)) {
+						str = str + ";;2 Jn";
+					} else if ("3 John".equals(bookName)) {
+						str = str + ";;3 Jn";
+					} else if ("Philemon".equals(bookName)) {
+						str = str + ";;Phm";
+					}
+					outEnglish.println(str);
 				}
+				outEnglish.flush();
+				outEnglish.close();
+
+				File fIndo = new File(bookNameFolder, LANG_BAHASA + ".bkn");
+				PrintWriter outIndo = new PrintWriter(fIndo, "UTF-8");
+				for (String bookName : arrBookNameIndo) {
+					outIndo.println(bookName);
+				}
+				outIndo.flush();
+				outIndo.close();
+
+			} catch (Exception e) {
+				Log.d(TAG, "Error write bookname file", e);
 			}
-			File[] bookNameFiles = bookNameFolder.listFiles();
-			if (bookNameFiles.length == 0) {
-				try {
-					File fEnglish = new File(bookNameFolder, LANG_ENGLISH + ".bkn");
-					PrintWriter outEnglish = new PrintWriter(fEnglish, "UTF-8");
-					for (String bookName : arrBookName) {
-						String str = bookName;
-						if ("Judges".equals(bookName)) {
-							str = str + ";;Judg";
-						} else if ("Jude".equals(bookName)) {
-							str = str + ";;Jude";
-						} else if ("John".equals(bookName)) {
-							str = str + ";;Jn";
-						} else if ("1 John".equals(bookName)) {
-							str = str + ";;1 Jn";
-						} else if ("2 John".equals(bookName)) {
-							str = str + ";;2 Jn";
-						} else if ("3 John".equals(bookName)) {
-							str = str + ";;3 Jn";
-						} else if ("Philemon".equals(bookName)) {
-							str = str + ";;Phm";
-						}
-						outEnglish.println(str);
-					}
-					outEnglish.flush();
-					outEnglish.close();
-					
-					File fIndo = new File(bookNameFolder, LANG_BAHASA + ".bkn");
-					PrintWriter outIndo = new PrintWriter(fIndo, "UTF-8");
-					for (String bookName : arrBookNameIndo) {
-						outIndo.println(bookName);
-					}
-					outIndo.flush();
-					outIndo.close();
-					
-				} catch (Exception e) {
-					Log.d(TAG, "Error write bookname file", e);
-				} 
-			}
-			
-			bookNameFolder = new File(sdcard.getPath() + BOOKNAME_FOLDER);
-			bookNameFiles = bookNameFolder.listFiles();
-			File bookNameFile = new File(bookNameFolder, currentBookLanguage + ".bkn");
-			if (bookNameFile.isFile()) {
-				readBookNameFile(bookNameFile);
-			} else {
-				loadDefaultBookName();
-			}
+		}
+
+		bookNameFolder = new File(sdcard.getPath() + BOOKNAME_FOLDER);
+		bookNameFiles = bookNameFolder.listFiles();
+		File bookNameFile = new File(bookNameFolder, currentBookLanguage + ".bkn");
+		if (bookNameFile.isFile()) {
+			readBookNameFile(bookNameFile);
+		} else {
+			loadDefaultBookName();
 		}
 	}
 
@@ -1218,7 +1354,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			loadDefaultBookName();
 		}
 	}
-	
+
 	private String[] readBibleFiles() {
 		String state = Environment.getExternalStorageState();
 		if (!Environment.MEDIA_MOUNTED.equals(state)) {
@@ -1232,8 +1368,8 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			});
 			return null;
 		}
-		
-		File sdcard = Environment.getExternalStorageDirectory();
+
+		File sdcard = getFilesDir();
 		File bibleFolder = new File(sdcard.getPath() + BIBLE_FOLDER);
 		List<BibleVersion> bibleList = databaseHelper.getAllBibleVersion();
 		String[] result = null;
@@ -1241,7 +1377,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		StringBuffer fileNames = new StringBuffer();
 
 		if (!bibleFolder.isDirectory()) {
-			boolean success = bibleFolder.mkdirs();			
+			boolean success = bibleFolder.mkdirs();
 			Log.d(TAG, "Creating bible directory success: " + success);
 		} else {
 			File[] arrFile = bibleFolder.listFiles();
@@ -1283,26 +1419,26 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 						BufferedReader raf = null;
 						InputStreamReader in = null;
 						char[] bufChar = new char[8192];
-						int offset = 0;	
+						int offset = 0;
 						int startOffset = 0;
 						try {
 							out = new DataOutputStream(new FileOutputStream(fIndex));
-							
+
 							in = new InputStreamReader(new FileInputStream(bibleFile), "UTF-8");
 							int numChar = in.read(bufChar);
 							startOffset = startOffset + numChar;
-							
+
 							int j = 0;
 							int verseCount = 1;
-							int verseCountIdx = 0;		
+							int verseCountIdx = 0;
 							int totalVerse = Integer.valueOf(arrVerseCount[verseCountIdx].substring(arrVerseCount[verseCountIdx].lastIndexOf(";") + 1));
-							
+
 							byte[] bomUtf8 = new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
 							if (Character.toString(bufChar[0]).equals(new String(bomUtf8, "UTF-8"))) {
 								offset = 1;
 							}
 							out.writeInt(offset);
-							
+
 							int prevBook = 0;
 							boolean done = false;
 							int eolLength = 0;
@@ -1316,9 +1452,9 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 												eolLength = 1;
 											}
 										}
-										
+
 										offset = startOffset - numChar + i;
-										
+
 										verseCount++;
 										if (verseCount > totalVerse) {
 											verseCount = 1;
@@ -1343,7 +1479,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 											}
 										}
 									}
-								}																
+								}
 								numChar = in.read(bufChar);
 								startOffset = startOffset + numChar;
 								j++;
@@ -1353,7 +1489,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 							if (!done) {
 								throw new IndexOutOfBoundsException("Bible file " + bibleFile.getName()	+ " is not valid");
 							}
-							
+
 							raf = new BufferedReader(new InputStreamReader(new FileInputStream(bibleFile), "UTF-8"), 8192);
 							raf.skip(offset+1);
 							String line = null;
@@ -1386,7 +1522,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 								sbAbout.append(bibleName);
 							}
 							about = sbAbout.toString();
-							
+
 							bibleOnDb.setEolLength(eolLength);
 							bibleOnDb.setFileName(bibleFile.getName());
 							bibleOnDb.setLastModified(bibleFile.length());
@@ -1403,7 +1539,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 							bibleFile.delete();
 						} finally {
 							try {
-								if (in != null) 
+								if (in != null)
 									in.close();
 								if (out != null)
 									out.close();
@@ -1412,7 +1548,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
-							
+
 						}
 					} else {
 						BibleVersion bibleVersion = bibleList.get(indexBible);
@@ -1431,12 +1567,30 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		return result;
 	}
 
-    @Override
+//	@Override
+//	public void openOptionsMenu() {
+//
+//		Configuration config = getResources().getConfiguration();
+//
+//		if((config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+//				> Configuration.SCREENLAYOUT_SIZE_LARGE) {
+//
+//			int originalScreenLayout = config.screenLayout;
+//			config.screenLayout = Configuration.SCREENLAYOUT_SIZE_LARGE;
+//			super.openOptionsMenu();
+//			config.screenLayout = originalScreenLayout;
+//
+//		} else {
+//			super.openOptionsMenu();
+//		}
+//	}
+
+	@Override
 	public void onClick(View v) {
 		if (currentChapterIdx == -1) return;
 		TextView txtVerse;
 		String str;
-		StringBuffer sb; 
+		StringBuffer sb;
 		switch (v.getId()) {
 		case R.id.btnNext:
 			if (currentChapterIdx == arrVerseCount.length - 1) {
@@ -1474,7 +1628,12 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
             }
             break;
         case R.id.btnMenu:
-            openOptionsMenu();
+        	runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					BiblesOfflineActivity.this.openOptionsMenu();
+				}
+			});
             break;
         case R.id.btnListen:
             if (bibleList == null || bibleList.size() == 0) {
@@ -1501,12 +1660,12 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		case R.id.btnZoomOut:
 			currentFontSize-=1;
 			updateBibleFontSize();
-			break;	
+			break;
 		case R.id.btnPlus:
 			if (bookmarkVerseEnd >= bookmarkVerseMax) return;
 			bookmarkVerseEnd++;
-			DisplayVerse verseToAdd = verseList.get(bookmarkVerseEnd-1);			
-			txtVerse = (TextView) bookmarkView.findViewById(R.id.txtVerse);			
+			DisplayVerse verseToAdd = verseList.get(bookmarkVerseEnd-1);
+			txtVerse = (TextView) bookmarkView.findViewById(R.id.txtVerse);
 			str = txtVerse.getText().toString();
 			sb = new StringBuffer(str);
 			sb.append(" ");
@@ -1519,7 +1678,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			DisplayVerse verseToDelete = verseList.get(bookmarkVerseEnd-1);
 			bookmarkVerseEnd--;
 			int lengthDelete = Util.parseVerse(verseToDelete.getVerse()).length() + 1;
-			txtVerse = (TextView) bookmarkView.findViewById(R.id.txtVerse);			
+			txtVerse = (TextView) bookmarkView.findViewById(R.id.txtVerse);
 			str = txtVerse.getText().toString();
 			sb = new StringBuffer(str);
 			sb.delete(sb.length()-lengthDelete, sb.length());
@@ -1529,8 +1688,8 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		case R.id.btnPlusClipboard:
 			if (bookmarkVerseEnd >= bookmarkVerseMax) return;
 			bookmarkVerseEnd++;
-			DisplayVerse verseToAddClipboard = verseList.get(bookmarkVerseEnd-1);			
-			txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);			
+			DisplayVerse verseToAddClipboard = verseList.get(bookmarkVerseEnd-1);
+			txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
 			str = txtVerse.getText().toString();
 			sb = new StringBuffer(str);
 			sb.append(" ");
@@ -1543,7 +1702,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			DisplayVerse verseToDeleteClipboard = verseList.get(bookmarkVerseEnd-1);
 			bookmarkVerseEnd--;
 			lengthDelete = Util.parseVerse(verseToDeleteClipboard.getVerse()).length() + 1;
-			txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);			
+			txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
 			str = txtVerse.getText().toString();
 			sb = new StringBuffer(str);
 			sb.delete(sb.length()-lengthDelete, sb.length());
@@ -1608,7 +1767,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 				TextView txtVerse = (TextView) copyToClipboardView.findViewById(R.id.txtVerse);
 				TextView txtBook = (TextView) copyToClipboardView.findViewById(R.id.txtBook);
 				if (copyOrShare == 'c') {
-					ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
+					ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 					clipboard.setText(txtBook.getText() + " " + txtVerse.getText());
 					String str = getResources().getString(R.string.copiedSuccess);
 					String msg = String.format(str, txtBook.getText());
@@ -1689,7 +1848,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			txtBibleName.setText(bible1 + " / " + bible2);
 		}
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -1709,7 +1868,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		databaseHelper.close();
 		isOpen = false;
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -1717,23 +1876,23 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		isOpen = true;
 		databaseHelper.getHistory(historyList);
 		historyAdapter.notifyDataSetChanged();
-		
+
 		fillSpinnerCategory();
 		if (gotoPrefs) {
 			gotoPrefs = false;
 			SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 			if (!defaultPrefs.getString(BOOK_LANGUAGE, LANG_ENGLISH).equals(currentBookLanguage)) {
 				currentBookLanguage = defaultPrefs.getString(BOOK_LANGUAGE, LANG_ENGLISH);
-				
-				File sdcard = Environment.getExternalStorageDirectory();
+
+				File sdcard = getFilesDir();
 				File bookNameFolder = new File(sdcard.getPath() + BOOKNAME_FOLDER);
 				File bookNameFile = new File(bookNameFolder, currentBookLanguage + ".bkn");
-				if (bookNameFile.isFile()) {					
+				if (bookNameFile.isFile()) {
 					readBookNameFile(bookNameFile);
 				} else {
 					loadDefaultBookName();
 				}
-				
+
 				updateBookLanguage();
 			}
 		} else if (gotoDownloadBible) {
@@ -1794,14 +1953,6 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			arrActiveBookAbbr[i] = abbr;
 		}
 	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
-		return true;
-	}
 
 	private void applyParallel(boolean isParallel) {
 		LinearLayout linearParallel = (LinearLayout) findViewById(R.id.linearParallel);
@@ -1819,6 +1970,14 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.parallel:
@@ -1826,7 +1985,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 					Toast.makeText(this, R.string.needMoreTranslation, Toast.LENGTH_LONG).show();
 					return true;
 				}
-				isParallel = !isParallel;				
+				isParallel = !isParallel;
 				applyParallel(isParallel);
 				if (isParallel) {
 					displayBible(currentBibleFilename, currentChapterIdx);
@@ -1862,7 +2021,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 				AlertDialog.Builder ad = new AlertDialog.Builder(this);
 				String[] arrImport = new String[] {"About " + currentBibleName, "About PB-Bible"};
 				ListView viewChooseAbout = new ListView(this);
-				ad.setView(viewChooseAbout);		
+				ad.setView(viewChooseAbout);
 				final AlertDialog dialogChooseAbout = ad.create();
 				dialogChooseAbout.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				viewChooseAbout.setAdapter(new ArrayAdapter<String>(this, R.layout.listitemmedium, arrImport));
@@ -1880,7 +2039,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 					}
 				});
 				dialogChooseAbout.show();
-				return true;	
+				return true;
 			case R.id.download:
 				gotoDownloadBible = true;
 				startActivity(new Intent(this, DownloadBible.class));
@@ -1922,46 +2081,46 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
   		int chapter = Integer.parseInt(arrBookChapter[1]);
   		bookmarkVerseMax = Integer.parseInt(arrBookChapter[2]);
   		StringBuffer sbBook = new StringBuffer();
-		
+
 //		if (currentBookLanguage.equals(Constants.LANG_BAHASA)) {
 //			sbBook.append(Constants.arrBookNameIndo[book - 1]).append(" ").append(chapter);
 //		} else {
 //			sbBook.append(Constants.arrBookName[book - 1]).append(" ").append(chapter);
 //		}
   		sbBook.append(arrActiveBookName[book - 1]).append(" ").append(chapter);
-		
+
 		sbBook.append(":").append(bookmarkVerseStart);
 		if (bookmarkVerseStart != bookmarkVerseEnd) {
 			sbBook.append("-").append(bookmarkVerseEnd);
 		}
-		
+
 		TextView txtBook = (TextView) bookmarkView.findViewById(R.id.txtBook);
 		txtBook.setText(sbBook.toString());
 	}
-	
+
 	private void refreshBookNameOnCopyToClipboardDialog() {
 		String[] arrBookChapter = arrVerseCount[currentChapterIdx].split(";");
   		int book = Integer.parseInt(arrBookChapter[0]);
   		int chapter = Integer.parseInt(arrBookChapter[1]);
   		bookmarkVerseMax = Integer.parseInt(arrBookChapter[2]);
   		StringBuffer sbBook = new StringBuffer();
-		
+
 //		if (currentBookLanguage.equals(Constants.LANG_BAHASA)) {
 //			sbBook.append(Constants.arrBookNameIndo[book - 1]).append(" ").append(chapter);
 //		} else {
 //			sbBook.append(Constants.arrBookName[book - 1]).append(" ").append(chapter);
 //		}
   		sbBook.append(arrActiveBookName[book - 1]).append(" ").append(chapter);
-		
+
 		sbBook.append(":").append(bookmarkVerseStart);
 		if (bookmarkVerseStart != bookmarkVerseEnd) {
 			sbBook.append("-").append(bookmarkVerseEnd);
 		}
-		
+
 		TextView txtBook = (TextView) copyToClipboardView.findViewById(R.id.txtBook);
 		txtBook.setText(sbBook.toString());
 	}
-	
+
 	private void fillSpinnerCategory() {
 		Spinner spnCategory = (Spinner) bookmarkView.findViewById(R.id.spnCategory);
 		List<String> categoryList = databaseHelper.getBookmarkCategoryList();
@@ -1975,7 +2134,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		if (parent == viewHistory) {			
+		if (parent == viewHistory) {
 			dialogHistory.dismiss();
 			currentChapterIdx = historyList.get(position);
 			displayBible(currentBibleFilename, currentChapterIdx);
@@ -1991,7 +2150,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
@@ -2003,7 +2162,7 @@ public class BiblesOfflineActivity extends AppCompatActivity implements OnClickL
 		super.onOptionsMenuClosed(menu);
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 	}
-	
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 	  super.onConfigurationChanged(newConfig);

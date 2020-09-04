@@ -108,7 +108,7 @@ public class DocumentsActivity extends Activity implements OnClickListener, OnIt
 			btnNext.setVisibility(View.INVISIBLE);
 		}
 		
-		File sdcard = Environment.getExternalStorageDirectory();
+		File sdcard = getFilesDir();
 		File documentFolder = new File(sdcard.getPath() + Constants.DOCUMENT_FOLDER);
 		if (!documentFolder.isDirectory()) {
 			boolean success = documentFolder.mkdirs();
@@ -206,7 +206,7 @@ public class DocumentsActivity extends Activity implements OnClickListener, OnIt
 			currentFontSize-=1;
 			updateFontSize();
 		} else if (v.getId() == R.id.txtDocumentName) {
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File documentFolder = new File(sdcard.getPath() + Constants.DOCUMENT_FOLDER);
 			File[] arrTocFile = documentFolder.listFiles(new FileFilter() {
 				@Override
@@ -389,7 +389,7 @@ public class DocumentsActivity extends Activity implements OnClickListener, OnIt
 		@Override
 		protected Object doInBackground(Object... arg) {
 			String tocFilename = (String) arg[0];
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File tocFile = new File(sdcard, Constants.DOCUMENT_FOLDER + "/" + tocFilename);
 			if (!tocFile.isFile()) return "NOT SUCCESS";
 			String conFileName = tocFile.getAbsolutePath().replaceAll(".toc", ".con");
@@ -627,7 +627,7 @@ public class DocumentsActivity extends Activity implements OnClickListener, OnIt
 			return;
 		}
 		
-		File sdcard = Environment.getExternalStorageDirectory();
+		File sdcard = getFilesDir();
 		File fileToc = new File(sdcard, Constants.DOCUMENT_FOLDER + "/" + currentFile);
 		String contentFileName = fileToc.getAbsolutePath().replaceAll(".toc", ".con");
 		String indexFileName = fileToc.getAbsolutePath().replaceAll(".toc", ".idx");

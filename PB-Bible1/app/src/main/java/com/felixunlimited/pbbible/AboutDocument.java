@@ -26,7 +26,7 @@ public class AboutDocument extends Activity {
 		String[] arrTitle;
 		
 		try {
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File tocFile = new File(sdcard, Constants.DOCUMENT_FOLDER + "/" + tocFileName);
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(tocFile), "UTF-8"), 512);
 			arrTitle = br.readLine().split(";;");

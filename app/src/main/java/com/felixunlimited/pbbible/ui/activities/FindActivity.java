@@ -290,7 +290,7 @@ public class FindActivity extends ListActivity
 		@Override
 		protected Object doInBackground(Object... arg) {
 			BibleVersion bibleVersion = databaseHelper.getBibleVersionByBibleName(bibleName);
-			File sdcard = Environment.getExternalStorageDirectory();
+			File sdcard = getFilesDir();
 			File file = new File(sdcard, Constants.BIBLE_FOLDER + "/" + bibleVersion.getFileName());
 			bibleFileName = bibleVersion.getFileName();
 			
